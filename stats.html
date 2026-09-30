@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6efe5">
+<title>Playtest Stats</title>
+<style>
+:root{
+  --bg:#f6efe5;--panel:#fffaf4;--ink:#2b201d;--muted:#7e6d65;--line:#dccbbb;
+  --accent:#9f3f4b;--accent2:#6f2731;--soft:#f0dfd2;--good:#3d6b51;--warn:#8a5b2c;
+  --shadow:0 10px 28px rgba(70,40,25,.08)
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-rounded,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{width:min(1100px,100%);margin:0 auto;padding:20px 14px 44px}
+h1{font-size:clamp(28px,6vw,46px);margin:0;line-height:1}
+.sub{margin:8px 0 0;color:var(--muted);font-size:15px}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+button,select{font:inherit}
+button{min-height:44px;border:0;border-radius:14px;padding:10px 16px;background:var(--accent);color:white;font-weight:800;cursor:pointer}
+button:active{transform:translateY(1px)}
+select{min-height:44px;border:1px solid var(--line);border-radius:12px;padding:8px 34px 8px 12px;background:var(--panel);color:var(--ink);font-size:16px}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.status{padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--panel);margin:10px 0 16px;color:var(--muted)}
+.status.err{border-color:#d99;color:#7e2626;background:#fff4f4}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}
+.metric{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.metric .n{font-size:30px;font-weight:900;line-height:1;margin-bottom:6px}
+.metric .l{color:var(--muted);font-size:13px}
+section{margin-top:18px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:var(--shadow)}
+h2{font-size:20px;margin:0 0 12px}
+.slotgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.slot{border:1px solid var(--line);border-radius:16px;padding:13px;background:#fff}
+.slot b{display:block;font-size:25px;margin:4px 0}
+.slot span{font-size:12px;color:var(--muted)}
+.tablewrap{overflow-x:auto;border-radius:14px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;min-width:720px;background:#fff}
+th,td{text-align:left;padding:11px 12px;border-bottom:1px solid #eadfd5;font-size:14px;vertical-align:top}
+th{background:#f4e9df;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#66564f}
+tr:last-child td{border-bottom:0}
+.pill{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:800;background:var(--soft);color:var(--accent2)}
+.pill.win{background:#e4f1e8;color:var(--good)}
+.pill.loss{background:#f7e3e3;color:#8b3030}
+.pill.live{background:#f4ebd9;color:var(--warn)}
+.games{display:grid;gap:10px}
+.game{border:1px solid var(--line);border-radius:16px;padding:13px;background:#fff}
+.gamehead{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.gamepath{font-weight:900;margin:9px 0 5px;font-size:18px}
+.gamedetail{font-size:13px;color:var(--muted);line-height:1.45}
+.setup{margin-top:14px;border:1px dashed #c9957a;border-radius:16px;padding:14px;background:#fff8f3}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.uid{overflow-wrap:anywhere;font-size:12px;background:#f0e6dd;padding:8px;border-radius:10px;margin:8px 0}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#2a2422;color:#f8eee8;padding:12px;border-radius:12px;font-size:11px;line-height:1.45}
+.small{font-size:12px;color:var(--muted)}
+.empty{color:var(--muted);padding:20px;text-align:center}
+@media(max-width:720px){
+  main{padding:16px 10px 36px}
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .slotgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .metric .n{font-size:26px}
+  .panel{padding:13px}
+}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <div>
+      <h1>Playtest Stats</h1>
+      <p class="sub">Live balance data from your Firebase playtests.</p>
+    </div>
+    <div class="controls">
+      <select id="players" aria-label="Filter by player count">
+        <option value="all">All players</option>
+        <option value="1">1 player</option>
+        <option value="2">2 players</option>
+        <option value="3">3 players</option>
+        <option value="4">4 players</option>
+      </select>
+      <button id="refresh" type="button">Refresh</button>
+    </div>
+  </div>
+
+  <div id="status" class="status">Connecting to Firebase…</div>
+
+  <div id="dashboard" hidden>
+    <div class="cards">
+      <div class="metric"><div class="n" id="gamesN">0</div><div class="l">Completed games</div></div>
+      <div class="metric"><div class="n" id="winN">—</div><div class="l">Win rate</div></div>
+      <div class="metric"><div class="n" id="turnN">—</div><div class="l">Avg. total turns</div></div>
+      <div class="metric"><div class="n" id="liveN">0</div><div class="l">In-progress records</div></div>
+    </div>
+
+    <section class="panel">
+      <h2>Turns by encounter position</h2>
+      <div id="slots" class="slotgrid"></div>
+      <p class="small">Averages use Bottoms that were actually punished. Failed Bottoms are shown separately in the detailed data.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Bottom balance</h2>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Bottom</th><th>Appearances</th><th>Avg turns</th><th>1st</th><th>2nd</th><th>3rd</th><th>4th</th><th>Failed</th>
+            </tr>
+          </thead>
+          <tbody id="bottomRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Recent games</h2>
+      <div id="recent" class="games"></div>
+    </section>
+  </div>
+
+  <div id="setup" class="setup" hidden>
+    <strong>One small Firebase permission step is still needed.</strong>
+    <p class="small">This page signed you into Firebase successfully, but Firestore is correctly blocking reads. Use the Admin UID below in your Firestore Rules so only this browser's Firebase user can read all playtest stats.</p>
+    <div class="uid" id="uid"></div>
+    <pre id="rules"></pre>
+    <p class="small">After publishing those rules, return here and tap Refresh. Keep this UID private-ish; it is not a password, but it identifies the account allowed to read your stats.</p>
+  </div>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAic7lQrn00ZHTJNwx34nWmmq3omWhCi9k",
+  authDomain: "spanko-game.firebaseapp.com",
+  projectId: "spanko-game",
+  storageBucket: "spanko-game.firebasestorage.app",
+  messagingSenderId: "282969797765",
+  appId: "1:282969797765:web:650a8d204edc569aee65ec",
+  measurementId: "G-KKSN607THV"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+let rawGames = [];
+
+const $ = id => document.getElementById(id);
+const avg = nums => nums.length ? nums.reduce((a,b)=>a+b,0)/nums.length : null;
+const fmt = n => n == null ? "—" : (Math.round(n*10)/10).toFixed(Number.isInteger(Math.round(n*10)/10)?0:1);
+const pct = n => n == null ? "—" : `${Math.round(n*100)}%`;
+
+function dateLabel(g){
+  const value = g.completedAt || g.startedAt;
+  if(!value) return "Unknown date";
+  try{
+    const d = typeof value === "string" ? new Date(value) :
+      (value.toDate ? value.toDate() : new Date(value));
+    return d.toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
+  }catch(e){ return "Unknown date"; }
+}
+
+function render(){
+  const filter = $("players").value;
+  const games = rawGames.filter(g => filter==="all" || String(g.playerCount)===filter);
+  const completed = games.filter(g => g.status==="complete" || g.result==="win" || g.result==="loss");
+  const inProgress = games.filter(g => !(g.status==="complete" || g.result==="win" || g.result==="loss"));
+
+  $("gamesN").textContent = completed.length;
+  $("liveN").textContent = inProgress.length;
+  $("winN").textContent = completed.length ? pct(completed.filter(g=>g.result==="win").length/completed.length) : "—";
+  $("turnN").textContent = fmt(avg(completed.map(g=>Number(g.totalTurns)).filter(Number.isFinite)));
+
+  const punished = [];
+  for(const g of games){
+    for(const b of (Array.isArray(g.bottoms)?g.bottoms:[])){
+      punished.push({...b, playerCount:g.playerCount, gameId:g.gameId});
+    }
+  }
+
+  $("slots").innerHTML = [1,2,3,4].map(order=>{
+    const rows = punished.filter(b=>Number(b.order)===order && b.status==="punished" && Number.isFinite(Number(b.turns)));
+    return `<div class="slot"><span>Bottom ${order}</span><b>${fmt(avg(rows.map(r=>Number(r.turns))))}</b><span>${rows.length} punished observation${rows.length===1?"":"s"}</span></div>`;
+  }).join("");
+
+  const names = new Map();
+  for(const b of punished){
+    if(!names.has(b.name)) names.set(b.name,[]);
+    names.get(b.name).push(b);
+  }
+  const table = [...names.entries()].map(([name,rows])=>{
+    const ok = rows.filter(r=>r.status==="punished" && Number.isFinite(Number(r.turns)));
+    const pos = o => fmt(avg(ok.filter(r=>Number(r.order)===o).map(r=>Number(r.turns))));
+    return {
+      name,
+      rows,
+      appearances:rows.length,
+      average:avg(ok.map(r=>Number(r.turns))),
+      p1:pos(1),p2:pos(2),p3:pos(3),p4:pos(4),
+      failed:rows.filter(r=>r.status==="failed").length
+    };
+  }).sort((a,b)=>(b.average??-1)-(a.average??-1) || a.name.localeCompare(b.name));
+
+  $("bottomRows").innerHTML = table.length ? table.map(r=>`
+    <tr>
+      <td><strong>${escapeHtml(r.name)}</strong></td>
+      <td>${r.appearances}</td>
+      <td>${fmt(r.average)}</td>
+      <td>${r.p1}</td><td>${r.p2}</td><td>${r.p3}</td><td>${r.p4}</td>
+      <td>${r.failed}</td>
+    </tr>`).join("") : `<tr><td colspan="8" class="empty">No Bottom observations yet.</td></tr>`;
+
+  const sorted = [...games].sort((a,b)=>{
+    const ad = new Date(a.completedAt||a.startedAt||0).getTime()||0;
+    const bd = new Date(b.completedAt||b.startedAt||0).getTime()||0;
+    return bd-ad;
+  }).slice(0,20);
+
+  $("recent").innerHTML = sorted.length ? sorted.map(g=>{
+    const done = g.status==="complete" || g.result==="win" || g.result==="loss";
+    const cls = g.result==="win" ? "win" : g.result==="loss" ? "loss" : "live";
+    const label = g.result==="win" ? "Win" : g.result==="loss" ? "Loss" : "In progress";
+    const bs = Array.isArray(g.bottoms)?g.bottoms:[];
+    const parts = bs.map(b=>b.status==="failed" ? "Failed" : `${b.turns}t`);
+    if(!done && g.currentBottom) parts.push("…");
+    const detail = bs.map(b=>`${escapeHtml(b.name)} — ${b.status==="failed"?"failed":`${b.turns} turns`}`).join(" · ");
+    return `<div class="game">
+      <div class="gamehead"><strong>${dateLabel(g)}</strong><span class="pill ${cls}">${label}</span></div>
+      <div class="gamepath">${parts.length?parts.join(" → "):"No Bottom completed yet"}</div>
+      <div class="gamedetail">${g.playerCount||1} player${Number(g.playerCount)===1?"":"s"}${detail?` · ${detail}`:""}${g.totalTurns?` · ${g.totalTurns} total turns`:""}</div>
+    </div>`;
+  }).join("") : `<div class="empty">No playtest records yet.</div>`;
+}
+
+function escapeHtml(s){
+  return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function showReadSetup(uid){
+  $("dashboard").hidden = true;
+  $("setup").hidden = false;
+  $("uid").textContent = uid;
+  $("status").className = "status err";
+  $("status").textContent = "Connected to Firebase, but this account does not have permission to read playtest data yet.";
+  $("rules").textContent =
+`rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /playtests/{gameId} {
+      allow create: if request.auth != null
+                    && request.resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.gameId == gameId;
+
+      allow update: if request.auth != null
+                    && resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.gameId == gameId;
+
+      allow read: if request.auth != null
+                  && request.auth.uid == "${uid}";
+
+      allow delete: if false;
+    }
+  }
+}`;
+}
+
+async function load(){
+  $("status").className="status";
+  $("status").textContent="Loading playtests…";
+  $("setup").hidden=true;
+  try{
+    let user=auth.currentUser;
+    if(!user) user=(await signInAnonymously(auth)).user;
+    const snap=await getDocs(collection(db,"playtests"));
+    rawGames=snap.docs.map(d=>({id:d.id,...d.data()}));
+    $("dashboard").hidden=false;
+    $("status").textContent=`Loaded ${rawGames.length} playtest record${rawGames.length===1?"":"s"}.`;
+    render();
+  }catch(err){
+    console.error(err);
+    if(err && (err.code==="permission-denied" || String(err.message).toLowerCase().includes("permission"))){
+      const user=auth.currentUser || (await signInAnonymously(auth)).user;
+      showReadSetup(user.uid);
+    }else{
+      $("dashboard").hidden=true;
+      $("status").className="status err";
+      $("status").textContent="Could not load playtest stats. Check your connection and try Refresh.";
+    }
+  }
+}
+
+$("players").addEventListener("change",render);
+$("refresh").addEventListener("click",load);
+load();
+</script>
+</body>
+</html>
