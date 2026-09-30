@@ -267,12 +267,95 @@ function notice(t){let e=$('#notice');e.textContent=t;e.classList.remove('hidden
 function locByName(n){return cp(LOCATIONS.find(x=>x.name===n))}
 function randomLocation(){return cp(LOCATIONS[Math.floor(Math.random()*LOCATIONS.length)])}
 
+/* ---- Playtest analytics scaffold (local only until Firebase is connected) ---- */
+const ANALYTICS_QUEUE_KEY='dbg_playtest_queue_v1';
+const ANALYTICS_DRAFT_KEY='dbg_playtest_draft_v1';
+function analyticsId(){
+  try{ if(window.crypto&&typeof crypto.randomUUID==='function') return crypto.randomUUID(); }catch(e){}
+  return 'g-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);
+}
+function analyticsRead(key,fallback){
+  try{
+    const raw=localStorage.getItem(key);
+    return raw?JSON.parse(raw):fallback;
+  }catch(e){ return fallback; }
+}
+function analyticsWrite(key,value){
+  try{ localStorage.setItem(key,JSON.stringify(value)); return true; }catch(e){ return false; }
+}
+function analyticsStartGame(playerCount){
+  return {
+    schemaVersion:1,
+    gameId:analyticsId(),
+    startedAt:new Date().toISOString(),
+    playerCount:Number(playerCount)||1,
+    result:null,
+    totalTurns:null,
+    bottoms:[],
+    currentBottom:null,
+    completedAt:null,
+    firebaseSynced:false
+  };
+}
+function analyticsStartBottom(){
+  if(!S||!S.analytics||!S.bottom)return;
+  S.analytics.currentBottom={
+    order:S.punished+1,
+    name:S.bottom.name,
+    startTurn:S.turn
+  };
+  analyticsSaveDraft();
+}
+function analyticsBottomPunished(){
+  if(!S||!S.analytics||!S.analytics.currentBottom)return;
+  const b=S.analytics.currentBottom;
+  const turns=Math.max(1,S.turn-b.startTurn+1);
+  const row={order:b.order,name:b.name,turns:turns,status:'punished'};
+  const existing=S.analytics.bottoms.findIndex(x=>x.order===row.order);
+  if(existing>=0) S.analytics.bottoms[existing]=row; else S.analytics.bottoms.push(row);
+  S.analytics.currentBottom=null;
+  analyticsSaveDraft();
+}
+function analyticsSaveDraft(){
+  if(!S||!S.analytics)return;
+  analyticsWrite(ANALYTICS_DRAFT_KEY,S.analytics);
+  if(typeof window.syncPlaytestAnalytics==='function') window.syncPlaytestAnalytics();
+}
+function analyticsFinalize(result){
+  if(!S||!S.analytics)return;
+  if(result==='loss'&&S.analytics.currentBottom){
+    const b=S.analytics.currentBottom;
+    const row={
+      order:b.order,
+      name:b.name,
+      turns:Math.max(1,S.turn-b.startTurn+1),
+      status:'failed'
+    };
+    const existing=S.analytics.bottoms.findIndex(x=>x.order===row.order);
+    if(existing>=0) S.analytics.bottoms[existing]=row; else S.analytics.bottoms.push(row);
+    S.analytics.currentBottom=null;
+  }
+  S.analytics.result=result;
+  S.analytics.totalTurns=S.turn;
+  S.analytics.completedAt=new Date().toISOString();
+
+  const q=analyticsRead(ANALYTICS_QUEUE_KEY,[]);
+  const idx=q.findIndex(x=>x.gameId===S.analytics.gameId);
+  const snapshot=JSON.parse(JSON.stringify(S.analytics));
+  if(idx>=0) q[idx]=snapshot; else q.push(snapshot);
+  analyticsWrite(ANALYTICS_QUEUE_KEY,q.slice(-250));
+  try{ localStorage.removeItem(ANALYTICS_DRAFT_KEY); }catch(e){}
+  if(typeof window.syncPlaytestAnalytics==='function') window.syncPlaytestAnalytics();
+}
+/* Firebase will later read/sync ANALYTICS_QUEUE_KEY; nothing is sent anywhere yet. */
+
+
 function makeLayers(b){let base=b.name==='Executive'?13:10;let clothing=base,bare=base;if(b.clothing.name==='Demure')clothing+=2;if(b.bare.name==='Already Sorry')bare-=2;return [{current:clothing,start:clothing},{current:base,start:base},{current:bare,start:bare}]}
-function startEncounter(){S.bottom=S.bottomDeck.shift();S.layers=makeLayers(S.bottom);S.position=null;S.ended=false;S.location=S.bottom.name==='Hotel Concierge'?locByName('Hotel Room'):randomLocation();log(`Encounter begins: ${S.bottom.name} at ${S.location.name}.`)}
+function startEncounter(){S.bottom=S.bottomDeck.shift();S.layers=makeLayers(S.bottom);S.position=null;S.ended=false;S.location=S.bottom.name==='Hotel Concierge'?locByName('Hotel Room'):randomLocation();log(`Encounter begins: ${S.bottom.name} at ${S.location.name}.`);analyticsStartBottom()}
 function refillSupply(){let limit=S.punished>=1?3:2;while(S.supply.length<limit&&S.supplyDeck.length)S.supply.push(S.supplyDeck.shift())}
 function resetTurnFlags(){S.flags={firstDiscipline:true,settle:false,perfectPosition:null,dontMove:false,built:false,oneMore:false,grip:null,continueAfterBreak:false,followThrough:false,makeItCount:false,goodMeasure:false,goodCount:0,lasting:false,backBasics:false,scoldLayer:null,notSoFast:false,bendLong:false}}
 function startTurn(first=false){if(!first&&S.ended&&!S.win)startEncounter();refillSupply();S.utility=1;S.discipline=S.punished>=3?4:3;S.taken=false;S.pending=null;resetTurnFlags();if(S.bottom.name==='Real Estate Agent'){S.location=randomLocation();log(`Open House changes the Location to ${S.location.name}.`)}}
-function newGame(n){let chosenI=shuffle(IMPLEMENTS).slice(0,8).map(cp),chosenN=shuffle(NONIMPS).slice(0,12).map(cp);S={players:[],active:0,turn:1,punished:0,bottomDeck:shuffle(BOTTOMS.map(cp)),bottom:null,layers:[],position:null,location:null,supplyDeck:shuffle([...chosenI,...chosenN]),supply:[],broken:[],removed:[],ended:false,win:false,loss:false,finalTaken:false,taken:false,utility:1,discipline:3,pending:null,flags:{},log:[],composition:[...chosenI,...chosenN].map(x=>x.name)};for(let i=0;i<n;i++){let p={name:`Player ${i+1}`,deck:shuffle(STARTING.map(cp)),discard:[],hand:[],acquired:[]};drawTo(p,4);S.players.push(p)}startEncounter();refillSupply();startTurn(true);render()}
+function newGame(n){let chosenI=shuffle(IMPLEMENTS).slice(0,8).map(cp),chosenN=shuffle(NONIMPS).slice(0,12).map(cp);S={players:[],active:0,turn:1,punished:0,bottomDeck:shuffle(BOTTOMS.map(cp)),bottom:null,layers:[],position:null,location:null,supplyDeck:shuffle([...chosenI,...chosenN]),supply:[],broken:[],removed:[],ended:false,win:false,loss:false,finalTaken:false,taken:false,utility:1,discipline:3,pending:null,flags:{},log:[],composition:[...chosenI,...chosenN].map(x=>x.name),analytics:analyticsStartGame(n)};for(let i=0;i<n;i++){let p={name:`Player ${i+1}`,deck:shuffle(STARTING.map(cp)),discard:[],hand:[],acquired:[]};drawTo(p,4);S.players.push(p)}startEncounter();refillSupply();startTurn(true);analyticsSaveDraft();render()}
 
 function openPending(type,card,title,options,extra={}){S.pending={type,card,title,options,...extra};render()}
 function spendUtility(){if(!S.utility)return false;S.utility--;return true}
@@ -350,7 +433,7 @@ function computeBasic(c){
 function applyImpact(n,source){if(n<=0||S.ended)return {broke:false};let left=n,broke=false;
  while(left>0&&!S.ended){let i=li();if(i<0)break;let use=Math.min(left,S.layers[i].current);S.layers[i].current-=use;left-=use;
    if(S.layers[i].current===0){broke=true;let broken=i;log(`${['Clothing','Underwear','Bare'][i]} Layer breaks.`);if(S.flags.scoldLayer===broken)S.flags.scoldLayer=null;
-     if(i===2){S.punished++;S.ended=true;log(`${S.bottom.name} is Punished. (${S.punished}/4)`);if(S.punished===4){S.win=true;log('Players win!')}break}
+     if(i===2){S.punished++;S.ended=true;analyticsBottomPunished();log(`${S.bottom.name} is Punished. (${S.punished}/4)`);if(S.punished===4){S.win=true;analyticsFinalize('win');log('Players win!')}break}
    }
  }
  log(`${source} deals ${n} Impact.`);if(broke&&!S.flags.continueAfterBreak)S.discipline=0;return {broke}
@@ -409,7 +492,7 @@ function takeSupply(i){if(S.taken)return notice('You already took your required 
 function endTurn(){if(S.pending)return notice('Finish resolving the current choice first.');if(!S.taken)return notice('You must take exactly 1 face-up Supply Closet card before ending the turn.');save();
  if(!S.ended){if(li()===0&&S.bottom.clothing.name==='Collected')recover(1,'Collected');if(S.location.name==='Beach House')recover(1,'Beach House')}
  let p=P();p.discard.push(...p.hand.splice(0));let handSize=S.punished>=2?5:4;if(S.location.name==='Office')handSize=Math.max(0,handSize-1);drawTo(p,handSize);
- if(S.finalTaken&&!S.win){S.loss=true;log('Supply Closet exhausted before the fourth Bottom was Punished. Players lose.');render();return}
+ if(S.finalTaken&&!S.win){S.loss=true;analyticsFinalize('loss');log('Supply Closet exhausted before the fourth Bottom was Punished. Players lose.');render();return}
  S.active=(S.active+1)%S.players.length;S.turn++;startTurn(false);render()
 }
 
@@ -454,4 +537,107 @@ $('#plusBtn').addEventListener('click',()=>{if(!S||S.ended)return;save();recover
 })();
 </script>
 </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAic7lQrn00ZHTJNwx34nWmmq3omWhCi9k",
+  authDomain: "spanko-game.firebaseapp.com",
+  projectId: "spanko-game",
+  storageBucket: "spanko-game.firebasestorage.app",
+  messagingSenderId: "282969797765",
+  appId: "1:282969797765:web:650a8d204edc569aee65ec",
+  measurementId: "G-KKSN607THV"
+};
+
+const QUEUE_KEY = "dbg_playtest_queue_v1";
+const DRAFT_KEY = "dbg_playtest_draft_v1";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let syncPromise = null;
+
+function readJSON(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (error) {
+    return fallback;
+  }
+}
+
+function writeJSON(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {}
+}
+
+async function getAnonymousUser() {
+  if (auth.currentUser) return auth.currentUser;
+  const credential = await signInAnonymously(auth);
+  return credential.user;
+}
+
+async function uploadRecord(record, user, status) {
+  if (!record || !record.gameId) return;
+  const cleanRecord = JSON.parse(JSON.stringify(record));
+  cleanRecord.ownerUid = user.uid;
+  cleanRecord.status = status;
+  cleanRecord.siteVersion = "rules-1.2-firebase-1";
+  cleanRecord.lastSyncedAt = serverTimestamp();
+
+  await setDoc(
+    doc(db, "playtests", cleanRecord.gameId),
+    cleanRecord,
+    { merge: true }
+  );
+}
+
+async function performSync() {
+  if (!navigator.onLine) return;
+
+  const user = await getAnonymousUser();
+
+  // Save partial progress too, so completed Bottoms survive if a tester leaves mid-game.
+  const draft = readJSON(DRAFT_KEY, null);
+  if (draft && draft.gameId) {
+    await uploadRecord(draft, user, "in_progress");
+  }
+
+  // Upload completed/lost games waiting in the local queue.
+  const queue = readJSON(QUEUE_KEY, []);
+  let changed = false;
+
+  for (const record of queue) {
+    if (!record || !record.gameId || record.firebaseSynced) continue;
+    try {
+      await uploadRecord(record, user, "complete");
+      record.firebaseSynced = true;
+      changed = true;
+    } catch (error) {
+      console.warn("Playtest analytics sync will retry later.", error);
+      break;
+    }
+  }
+
+  if (changed) writeJSON(QUEUE_KEY, queue);
+}
+
+window.syncPlaytestAnalytics = function () {
+  if (syncPromise) return syncPromise;
+  syncPromise = performSync()
+    .catch((error) => console.warn("Playtest analytics unavailable; data remains queued locally.", error))
+    .finally(() => { syncPromise = null; });
+  return syncPromise;
+};
+
+window.addEventListener("online", () => window.syncPlaytestAnalytics());
+window.syncPlaytestAnalytics();
+</script>
+
 </body></html>
