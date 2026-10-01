@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f3d48"><title>Deck Building Game — Rules 1.2 Playtest</title><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f3d48"><title>Deck Building Game — Rules 1.2 Mobile Usability</title><style>
 :root{
   --viz-text:#2c211c;--viz-muted:#78665c;--viz-card:#fffaf2;--viz-panel:#f7efe4;
   --viz-border:#ddcdbd;--viz-accent:#8f3d48;--viz-accent-bg:#8f3d48;
@@ -49,6 +49,37 @@ section>div:first-child>.text-xs.uppercase{color:#8f3d48}
 @media(min-width:640px){.sm\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.sm\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.sm\:grid-cols-\[140px_1fr\]{grid-template-columns:140px minmax(0,1fr)}}
 @media(min-width:768px){.md\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.md\:col-span-2{grid-column:span 2/span 2}}
 @media(min-width:1024px){.lg\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+#mobileHud{display:none}
+.art-placeholder{
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  width:100%;aspect-ratio:3/2;border:1px dashed var(--viz-border);
+  border-radius:.7rem;background:rgba(255,255,255,.28);
+  color:var(--viz-muted);font-size:.76rem;padding:.75rem
+}
+@media(max-width:639px){
+ #mobileHud{
+   display:block;position:sticky;top:0;z-index:40;
+   background:rgba(255,250,242,.97);border:1px solid var(--viz-border);
+   border-radius:.8rem;padding:.55rem .65rem;
+   box-shadow:0 8px 22px rgba(62,38,28,.14);
+   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)
+ }
+ .hudTop{display:flex;justify-content:space-between;gap:.5rem;align-items:center;min-width:0}
+ .hudIdentity{display:flex;gap:.4rem;align-items:baseline;min-width:0;white-space:nowrap}
+ #hudTurn{font-size:.72rem;color:var(--viz-muted);font-weight:700}
+ #hudBottom{font-size:.9rem;overflow:hidden;text-overflow:ellipsis}
+ .hudSupply{font-size:.7rem;font-weight:800;white-space:nowrap;padding:.2rem .42rem;border-radius:999px;background:var(--viz-panel)}
+ .hudSupply.required{background:#f6dfdc;color:#7d3038}
+ .hudSupply.done{background:#e5efe5;color:#365d42}
+ .hudState{display:grid;grid-template-columns:1.35fr 1.15fr .7fr .7fr;gap:.3rem;margin-top:.45rem}
+ .hudState span{
+   min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+   background:var(--viz-panel);border-radius:.48rem;padding:.32rem .38rem;
+   font-size:.7rem;font-weight:750;text-align:center
+ }
+}
+
 @media(max-width:639px){
  body{padding:8px;background:#f5eee6}
  #dbg12-art{font-size:15px}
@@ -58,19 +89,35 @@ section>div:first-child>.text-xs.uppercase{color:#8f3d48}
  #game>section:first-child{display:block}
  #game>section:first-child>div+div{margin-top:.65rem}
  #game>section:first-child .grid{grid-template-columns:1fr}
- #bottomArt{max-width:160px;margin:0 auto 10px}
- #bottomArt img{aspect-ratio:4/5}
- #locationArt img{max-height:190px}
+ #bottomArt{max-width:none;margin:0 0 10px}
+ #bottomArt img{width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;object-position:center}
+ #locationArt img{width:100%;height:auto;max-height:none;aspect-ratio:3/2;object-fit:cover}
+ #game>section:first-of-type>div{padding:.8rem}
+ #game>section:first-of-type .text-xl{font-size:1.25rem}
+ #bottomFlavor,#locationFlavor{font-size:.82rem;line-height:1.35}
+ #persistentTrait,#layerTrait,#locationEffect{font-size:.86rem;line-height:1.38}
+ #positionLabel{margin-top:.55rem}
+
  #layers{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:.35rem}
  #layers>div{padding:.6rem .45rem;text-align:center}
  #layers .text-xl{font-size:1.18rem}
- #game>section:nth-of-type(2) .grid{grid-template-columns:1fr!important}
+ #game>section:nth-of-type(2){padding:.8rem}
+ #game>section:nth-of-type(2)>div:first-child>div:first-child>div:nth-child(2){display:none}
+ #game>section:nth-of-type(2) .grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:.4rem;margin-top:.55rem}
+ #game>section:nth-of-type(2) button{min-height:58px!important;padding:.5rem!important;text-align:center}
+ #game>section:nth-of-type(2) button .mt-1{display:none}
+
  #supply,#hand{display:flex!important;overflow-x:auto;scroll-snap-type:x mandatory;gap:.7rem;padding-bottom:.4rem;margin-left:-.1rem;margin-right:-.1rem}
- #supply>div,#hand>button{min-width:82vw;max-width:82vw;scroll-snap-align:start;flex:0 0 82vw}
- #supply img,#hand img{height:170px;aspect-ratio:auto}
+ #supply>div,#hand>button{min-width:78vw;max-width:78vw;scroll-snap-align:center;flex:0 0 78vw}
+ #supply img,#hand img{width:100%;height:auto;aspect-ratio:3/2;object-fit:cover}
+ #supply>div,#hand>button{padding:.72rem}
+
  #resolving .grid{grid-template-columns:1fr!important}
  #endTurnBtn{position:sticky;bottom:8px;z-index:20;box-shadow:0 8px 25px rgba(0,0,0,.18)}
  #game>section:nth-of-type(4)>div:first-child{align-items:flex-start}
+ #game>section:nth-of-type(3),#game>section:nth-of-type(4){padding:.8rem}
+ #game{gap:.7rem!important}
+ #dbg12-art details{padding:.8rem}
  .text-right{text-align:left}
 }
 </style></head><body>
@@ -89,6 +136,21 @@ section>div:first-child>.text-xs.uppercase{color:#8f3d48}
   </div>
 
   <div id="game" class="hidden space-y-4">
+    <div id="mobileHud" aria-live="polite">
+      <div class="hudTop">
+        <div class="hudIdentity">
+          <span id="hudTurn"></span>
+          <strong id="hudBottom"></strong>
+        </div>
+        <div id="hudSupply" class="hudSupply"></div>
+      </div>
+      <div class="hudState">
+        <span id="hudLayer"></span>
+        <span id="hudPosition"></span>
+        <span id="hudUtility"></span>
+        <span id="hudDiscipline"></span>
+      </div>
+    </div>
     <section class="grid gap-3 md:grid-cols-3">
       <div class="rounded-xl border border-[var(--viz-border)] bg-[var(--viz-card)] p-4 md:col-span-2">
         <div class="grid gap-4 sm:grid-cols-[140px_1fr]">
@@ -267,7 +329,9 @@ function notice(t){let e=$('#notice');e.textContent=t;e.classList.remove('hidden
 function locByName(n){return cp(LOCATIONS.find(x=>x.name===n))}
 function randomLocation(){return cp(LOCATIONS[Math.floor(Math.random()*LOCATIONS.length)])}
 
-/* ---- Playtest analytics scaffold (local only until Firebase is connected) ---- */
+/* ---- Playtest analytics scaffold ---- */
+/* Gameplay patch: Scolding persists across turns until its current Layer breaks. */
+/* Mobile usability pass: sticky HUD, compact actions, wide card-art windows, art placeholders. */
 const ANALYTICS_QUEUE_KEY='dbg_playtest_queue_v1';
 const ANALYTICS_DRAFT_KEY='dbg_playtest_draft_v1';
 function analyticsId(){
@@ -351,9 +415,9 @@ function analyticsFinalize(result){
 
 
 function makeLayers(b){let base=b.name==='Executive'?13:10;let clothing=base,bare=base;if(b.clothing.name==='Demure')clothing+=2;if(b.bare.name==='Already Sorry')bare-=2;return [{current:clothing,start:clothing},{current:base,start:base},{current:bare,start:bare}]}
-function startEncounter(){S.bottom=S.bottomDeck.shift();S.layers=makeLayers(S.bottom);S.position=null;S.ended=false;S.location=S.bottom.name==='Hotel Concierge'?locByName('Hotel Room'):randomLocation();log(`Encounter begins: ${S.bottom.name} at ${S.location.name}.`);analyticsStartBottom()}
+function startEncounter(){S.bottom=S.bottomDeck.shift();S.layers=makeLayers(S.bottom);S.position=null;S.ended=false;if(S.flags)S.flags.scoldLayer=null;S.location=S.bottom.name==='Hotel Concierge'?locByName('Hotel Room'):randomLocation();log(`Encounter begins: ${S.bottom.name} at ${S.location.name}.`);analyticsStartBottom()}
 function refillSupply(){let limit=S.punished>=1?3:2;while(S.supply.length<limit&&S.supplyDeck.length)S.supply.push(S.supplyDeck.shift())}
-function resetTurnFlags(){S.flags={firstDiscipline:true,settle:false,perfectPosition:null,dontMove:false,built:false,oneMore:false,grip:null,continueAfterBreak:false,followThrough:false,makeItCount:false,goodMeasure:false,goodCount:0,lasting:false,backBasics:false,scoldLayer:null,notSoFast:false,bendLong:false}}
+function resetTurnFlags(){let scoldLayer=(S.flags&&Number.isInteger(S.flags.scoldLayer))?S.flags.scoldLayer:null;S.flags={firstDiscipline:true,settle:false,perfectPosition:null,dontMove:false,built:false,oneMore:false,grip:null,continueAfterBreak:false,followThrough:false,makeItCount:false,goodMeasure:false,goodCount:0,lasting:false,backBasics:false,scoldLayer:scoldLayer,notSoFast:false,bendLong:false}}
 function startTurn(first=false){if(!first&&S.ended&&!S.win)startEncounter();refillSupply();S.utility=1;S.discipline=S.punished>=3?4:3;S.taken=false;S.pending=null;resetTurnFlags();if(S.bottom.name==='Real Estate Agent'){S.location=randomLocation();log(`Open House changes the Location to ${S.location.name}.`)}}
 function newGame(n){let chosenI=shuffle(IMPLEMENTS).slice(0,8).map(cp),chosenN=shuffle(NONIMPS).slice(0,12).map(cp);S={players:[],active:0,turn:1,punished:0,bottomDeck:shuffle(BOTTOMS.map(cp)),bottom:null,layers:[],position:null,location:null,supplyDeck:shuffle([...chosenI,...chosenN]),supply:[],broken:[],removed:[],ended:false,win:false,loss:false,finalTaken:false,taken:false,utility:1,discipline:3,pending:null,flags:{},log:[],composition:[...chosenI,...chosenN].map(x=>x.name),analytics:analyticsStartGame(n)};for(let i=0;i<n;i++){let p={name:`Player ${i+1}`,deck:shuffle(STARTING.map(cp)),discard:[],hand:[],acquired:[]};drawTo(p,4);S.players.push(p)}startEncounter();refillSupply();startTurn(true);analyticsSaveDraft();render()}
 
@@ -497,7 +561,12 @@ function endTurn(){if(S.pending)return notice('Finish resolving the current choi
 }
 
 function cardVisual(c,button=false,index=0,zone='card'){
- let img=hasArt(c.name)?`<div class="mb-3 overflow-hidden rounded-lg">${artImg(c.name,'h-36 w-full object-cover')}</div>`:'';
+ let img='';
+ if(c.implement){
+   img=hasArt(c.name)
+     ?`<div class="mb-3 overflow-hidden rounded-lg">${artImg(c.name,'h-36 w-full object-cover')}</div>`
+     :`<div class="mb-3 art-placeholder">Art placeholder</div>`;
+ }
  let meta=c.implement?`${esc(c.reach)} IMPLEMENT · ${esc(c.type)}`:'DISCIPLINE CARD';
  let body=`${img}<div class="font-semibold">${esc(c.name)}</div><div class="mt-1 text-xs font-semibold text-[var(--viz-muted)]">${meta}</div><div class="mt-2 text-sm">${esc(c.effect)}</div>${c.flavor?`<div class="mt-2 text-sm italic text-[var(--viz-muted)]">${esc(c.flavor)}</div>`:''}`;
  if(button)return `<button type="button" data-${zone}="${index}" ${S.discipline<1||S.pending||S.ended?'disabled':''} class="rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3 text-left disabled:opacity-40">${body}</button>`;
@@ -509,12 +578,20 @@ function activeFlags(){let out=[];if(S.flags.settle)out.push('Settle In');if(S.f
 
 function render(){if(!S)return;$('#setup').classList.add('hidden');$('#game').classList.remove('hidden');
  $('#turnLabel').textContent=`Turn ${S.turn} · ${P().name}`;$('#bottomName').textContent=S.bottom.name;$('#bottomFlavor').textContent=S.bottom.flavor;
- $('#bottomArt').innerHTML=hasArt(S.bottom.name)?artImg(S.bottom.name,'w-full rounded-lg object-cover'):`<div class="flex min-h-32 items-center justify-center rounded-lg border border-dashed border-[var(--viz-border)] p-3 text-center text-xs text-[var(--viz-muted)]">No saved art yet</div>`;
+ $('#bottomArt').innerHTML=hasArt(S.bottom.name)?artImg(S.bottom.name,'w-full rounded-lg object-cover'):`<div class="art-placeholder">Art placeholder</div>`;
  $('#persistentTrait').textContent=`Persistent Trait — ${S.bottom.persistent.name}: ${S.bottom.persistent.effect}${persistentIgnored()?' (ignored for this Layer)':''}`;
  $('#layerTrait').textContent=traitText();$('#progressLabel').textContent=`Bottoms Punished ${S.punished}/4`;$('#clockLabel').textContent=`Supply remaining ${S.supplyDeck.length+S.supply.length}/20 · Broken ${S.broken.length}`;
  $('#locationName').textContent=S.location.name;$('#locationFlavor').textContent=S.location.flavor;$('#locationEffect').textContent=S.location.effect;
- $('#locationArt').innerHTML=hasArt(S.location.name)?artImg(S.location.name,'h-40 w-full rounded-lg object-cover'):'';
+ $('#locationArt').innerHTML=hasArt(S.location.name)?artImg(S.location.name,'h-40 w-full rounded-lg object-cover'):`<div class="art-placeholder">Art placeholder</div>`;
  $('#positionLabel').textContent=`Position: ${S.position||'Unpositioned'}`;$('#utilityCount').textContent=`${S.utility} remaining`;$('#disciplineCount').textContent=`${S.discipline} remaining`;$('#utilityStatus').textContent=S.utility?'Available':'Spent';
+ $('#hudTurn').textContent=`T${S.turn} · ${P().name.replace('Player ','P')}`;
+ $('#hudBottom').textContent=S.bottom.name;
+ $('#hudLayer').textContent=`${lname()} ${S.layers[li()].current}/${S.layers[li()].start}`;
+ $('#hudPosition').textContent=S.position||'Unpositioned';
+ $('#hudUtility').textContent=`U ${S.utility}`;
+ $('#hudDiscipline').textContent=`D ${S.discipline}`;
+ $('#hudSupply').textContent=S.taken?'Supply ✓':'Supply required';
+ $('#hudSupply').className=`hudSupply ${S.taken?'done':'required'}`;
  $('#layers').innerHTML=['Clothing','Underwear','Bare'].map((x,i)=>`<div class="rounded-lg ${i===li()?'border-2 border-[var(--viz-accent)]':'border border-[var(--viz-border)]'} bg-[var(--viz-panel)] p-3"><div class="text-xs font-semibold text-[var(--viz-muted)]">${x}${i===li()?' · CURRENT':''}</div><div class="mt-1 text-xl font-semibold">${S.layers[i].current} / ${S.layers[i].start}</div></div>`).join('');
  $('#focusBtn').disabled=!S.utility;$('#refineBtn').disabled=!S.utility||!P().discard.some(c=>c.basic);$('#repairBtn').disabled=!S.utility||!S.broken.length;
  $('#supplyStatus').textContent=S.taken?'Required card taken ✓':'1 card still required';
