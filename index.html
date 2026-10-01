@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f3d48"><title>Deck Building Game — Rules 1.2 Text Card Normalized</title><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f3d48"><title>Deck Building Game — Rules 1.2 Fixed Text Card Size</title><style>
 :root{
   --viz-text:#2c211c;--viz-muted:#78665c;--viz-card:#fffaf2;--viz-panel:#f7efe4;
   --viz-border:#ddcdbd;--viz-accent:#8f3d48;--viz-accent-bg:#8f3d48;
@@ -265,6 +265,39 @@ html,body{max-width:100%;overflow-x:clip}
     padding-top:.55rem!important;
     font-size:.69rem!important;
     line-height:1.26!important;
+  }
+}
+
+
+@media(max-width:639px){
+  /* One physical-card size for every text-only Discipline card. */
+  #hand .text-card,
+  #supply .text-card{
+    height:265px!important;
+    min-height:265px!important;
+    max-height:265px!important;
+  }
+
+  #hand .text-card .play-card-copy,
+  #supply .text-card .play-card-copy{
+    height:100%!important;
+    min-height:0!important;
+  }
+
+  /* Keep long acquired-card rules readable inside the same card size. */
+  #hand .text-card .play-card-effect,
+  #supply .text-card .play-card-effect{
+    font-size:.86rem!important;
+    line-height:1.22!important;
+    margin-top:.65rem!important;
+    margin-bottom:auto!important;
+  }
+
+  #hand .text-card .play-card-flavor,
+  #supply .text-card .play-card-flavor{
+    font-size:.66rem!important;
+    line-height:1.2!important;
+    padding-top:.45rem!important;
   }
 }
 
