@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f3d48"><title>Deck Building Game — Rules 1.2 Fixed Text Card Size</title><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f3d48"><title>Deck Building Game — Rules 1.2 Utility Menus</title><style>
 :root{
   --viz-text:#2c211c;--viz-muted:#78665c;--viz-card:#fffaf2;--viz-panel:#f7efe4;
   --viz-border:#ddcdbd;--viz-accent:#8f3d48;--viz-accent-bg:#8f3d48;
@@ -207,10 +207,10 @@ html,body{max-width:100%;overflow-x:clip}
  #layers>div{padding:.6rem .45rem;text-align:center}
  #layers .text-xl{font-size:1.18rem}
  #game>section:nth-of-type(2){padding:.8rem}
- #game>section:nth-of-type(2)>div:first-child>div:first-child>div:nth-child(2){display:none}
- #game>section:nth-of-type(2) .grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:.4rem;margin-top:.55rem}
- #game>section:nth-of-type(2) button{min-height:58px!important;padding:.5rem!important;text-align:center}
- #game>section:nth-of-type(2) button .mt-1{display:none}
+ #game>section:nth-of-type(2)>div:first-child>div:first-child>div:nth-child(2){display:block;font-size:.72rem;line-height:1.25}
+ #game>section:nth-of-type(2) .grid{grid-template-columns:1fr!important;gap:.4rem;margin-top:.55rem}
+ #game>section:nth-of-type(2) button{min-height:58px!important;padding:.55rem .7rem!important;text-align:left}
+ #game>section:nth-of-type(2) button .mt-1{display:block!important;font-size:.72rem;line-height:1.25;margin-top:.15rem!important}
 
 
  #resolving .grid{grid-template-columns:1fr!important}
@@ -299,6 +299,49 @@ html,body{max-width:100%;overflow-x:clip}
     line-height:1.2!important;
     padding-top:.45rem!important;
   }
+}
+
+
+.choice-modal{position:fixed;inset:0;z-index:120}
+.choice-modal.hidden{display:none}
+.choice-backdrop{position:absolute;inset:0;background:rgba(38,28,24,.46)}
+.choice-sheet{
+  position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+  width:min(680px,100%);max-height:78vh;overflow:auto;
+  border-radius:1.1rem 1.1rem 0 0;
+  border:1px solid var(--viz-border);
+  background:var(--viz-card);
+  padding:.7rem .85rem calc(1rem + env(safe-area-inset-bottom));
+  box-shadow:0 -12px 34px rgba(54,33,25,.2)
+}
+.choice-handle{
+  width:42px;height:4px;border-radius:999px;background:var(--viz-border);
+  margin:.1rem auto .7rem
+}
+.choice-title{font-size:1.1rem;font-weight:850}
+.choice-help{margin-top:.25rem;color:var(--viz-muted);font-size:.82rem;line-height:1.35}
+.choice-list{display:grid;gap:.55rem;margin-top:.8rem}
+.choice-option{
+  width:100%;min-height:58px;text-align:left;
+  border:1px solid var(--viz-border);border-radius:.8rem;
+  background:var(--viz-panel);padding:.7rem
+}
+.choice-option-inner{display:grid;grid-template-columns:auto 1fr;gap:.65rem;align-items:center}
+.choice-thumb{
+  width:72px;aspect-ratio:3/2;border-radius:.55rem;overflow:hidden;
+  border:1px dashed var(--viz-border);display:flex;align-items:center;justify-content:center;
+  color:var(--viz-muted);font-size:.6rem;text-align:center;background:rgba(255,255,255,.25)
+}
+.choice-thumb img{width:100%;height:100%;object-fit:cover}
+.choice-option-title{font-weight:800}
+.choice-option-sub{margin-top:.18rem;color:var(--viz-muted);font-size:.75rem;line-height:1.28}
+.choice-cancel{
+  width:100%;min-height:44px;margin-top:.7rem;border-radius:.75rem;
+  border:1px solid var(--viz-border);background:transparent;font-weight:700
+}
+body.choice-open{overflow:hidden}
+@media(min-width:640px){
+  .choice-sheet{bottom:50%;transform:translate(-50%,50%);border-radius:1.1rem;max-height:70vh}
 }
 
 </style></head><body>
@@ -411,6 +454,14 @@ html,body{max-width:100%;overflow-x:clip}
       <button id="restartBtn" type="button" class="min-h-11 rounded-lg border border-[var(--viz-border)] px-3">Restart</button>
       <button id="minusBtn" type="button" class="min-h-11 rounded-lg border border-[var(--viz-border)] px-3">Manual −1 Composure</button>
       <button id="plusBtn" type="button" class="min-h-11 rounded-lg border border-[var(--viz-border)] px-3">Manual +1 Composure</button>
+    </div>
+  </div>
+
+  <div id="choiceModal" class="choice-modal hidden" role="dialog" aria-modal="true" aria-labelledby="choiceModalTitle">
+    <div class="choice-backdrop"></div>
+    <div class="choice-sheet">
+      <div class="choice-handle" aria-hidden="true"></div>
+      <div id="choiceModalBody"></div>
     </div>
   </div>
 
@@ -604,9 +655,9 @@ function newGame(n){let chosenI=shuffle(IMPLEMENTS).slice(0,8).map(cp),chosenN=s
 
 function openPending(type,card,title,options,extra={}){S.pending={type,card,title,options,...extra};render()}
 function spendUtility(){if(!S.utility)return false;S.utility--;return true}
-function focus(){if(!S.utility)return notice('Utility Action already used.');save();spendUtility();drawOne(P());log('Focus draws 1 card.');openPending('focus',null,'Focus — discard 1 card',P().hand.map((c,i)=>({label:c.name,sub:c.effect,index:i})))}
-function refine(){if(!S.utility)return notice('Utility Action already used.');let a=P().discard.map((c,i)=>({c,i})).filter(x=>x.c.basic);if(!a.length)return notice('No Basic card is in your discard pile.');save();openPending('refine',null,'Refine — permanently remove 1 Basic card',a.map(x=>({label:x.c.name,sub:x.c.effect,index:x.i})))}
-function repair(){if(!S.utility)return notice('Utility Action already used.');if(!S.broken.length)return notice('The Broken Pile is empty.');save();openPending('repair',null,'Repair — choose a Broken Implement',S.broken.map((c,i)=>({label:c.name,sub:c.effect,index:i})))}
+function focus(){if(!S.utility)return notice('Utility Action already used.');save();spendUtility();drawOne(P());log('Focus draws 1 card.');openPending('focus',null,'Focus',P().hand.map((c,i)=>({label:c.name,sub:c.effect,index:i,card:c})),{help:'You drew 1 card. Choose 1 card from your hand to discard.'})}
+function refine(){if(!S.utility)return notice('Utility Action already used.');let a=P().discard.map((c,i)=>({c,i})).filter(x=>x.c.basic);if(!a.length)return notice('No Basic card is in your discard pile.');save();openPending('refine',null,'Refine',a.map(x=>({label:x.c.name,sub:x.c.effect,index:x.i,card:x.c})),{help:'Choose 1 Basic card from your discard pile to permanently remove from the game.'})}
+function repair(){if(!S.utility)return notice('Utility Action already used.');if(!S.broken.length)return notice('The Broken Pile is empty.');save();openPending('repair',null,'Repair',S.broken.map((c,i)=>({label:c.name,sub:c.effect,index:i,card:c})),{help:'Choose 1 Broken Implement. It will be repaired and moved to your discard pile.'})}
 
 function resolvePending(i){let q=S.pending,o=q&&q.options[i];if(!o)return;
  if(q.type==='focus'){let c=P().hand.splice(o.index,1)[0];if(c){P().discard.push(c);log(`Focus discards ${c.name}.`)}}
@@ -762,6 +813,27 @@ function cardVisual(c,button=false,index=0,zone='card'){
  return body;
 }
 function pendingHtml(){if(!S.pending)return'';let q=S.pending;let img=q.card&&hasArt(q.card.name)?`<div class="mb-3 max-w-[180px]">${artImg(q.card.name)}</div>`:'';return `${img}<div class="text-xs font-semibold uppercase tracking-wide text-[var(--viz-muted)]">Resolving</div><div class="mt-1 font-semibold">${esc(q.title)}</div>${q.card?`<div class="mt-1 text-sm">${esc(q.card.effect)}</div>`:''}<div class="mt-3 grid gap-2 sm:grid-cols-2">${q.options.map((o,i)=>`<button type="button" data-choice="${i}" class="min-h-11 rounded-lg border border-[var(--viz-border)] bg-[var(--viz-card)] p-3 text-left"><div class="font-semibold">${esc(o.label)}</div>${o.sub?`<div class="mt-1 text-sm text-[var(--viz-muted)]">${esc(o.sub)}</div>`:''}</button>`).join('')}</div>`}
+function isUtilityPending(q){return !!q&&['focus','refine','repair'].includes(q.type)}
+function utilityChoiceHtml(q){
+ let options=q.options.map((o,i)=>{
+   let c=o.card,thumb='';
+   if(c&&c.implement){
+     thumb=hasArt(c.name)?`<div class="choice-thumb">${artImg(c.name,'w-full h-full object-cover')}</div>`:`<div class="choice-thumb">Art<br>placeholder</div>`;
+   }else{
+     thumb=`<div class="choice-thumb">Card</div>`;
+   }
+   return `<button type="button" data-choice="${i}" class="choice-option"><div class="choice-option-inner">${thumb}<div><div class="choice-option-title">${esc(o.label)}</div>${o.sub?`<div class="choice-option-sub">${esc(o.sub)}</div>`:''}</div></div></button>`;
+ }).join('');
+ let cancel=q.type==='focus'?'':`<button type="button" data-cancel-utility="1" class="choice-cancel">Cancel</button>`;
+ return `<div id="choiceModalTitle" class="choice-title">${esc(q.title)}</div><div class="choice-help">${esc(q.help||'Choose a card.')}</div><div class="choice-list">${options}</div>${cancel}`;
+}
+function cancelUtilityPending(){
+ if(!S.pending||S.pending.type==='focus')return;
+ S.pending=null;
+ if(H.length)H.pop();
+ render();
+}
+
 function traitText(){let t=activeLayerTrait();return t?`${lname()} Trait — ${t.name}: ${t.effect}`:'Underwear — no additional Layer Trait.'}
 function activeFlags(){let out=[];if(S.flags.settle)out.push('Settle In');if(S.flags.perfectPosition)out.push(`Perfect Setup (${S.flags.perfectPosition})`);if(S.flags.dontMove)out.push('Don’t Move');if(S.flags.built)out.push('Built to Last');if(S.flags.oneMore)out.push('One More');if(S.flags.grip)out.push('Change Your Grip');if(S.flags.continueAfterBreak)out.push('Not Finished Yet');if(S.flags.followThrough)out.push('Follow Through');if(S.flags.makeItCount)out.push('Make It Count');if(S.flags.goodMeasure)out.push(`For Good Measure (${S.flags.goodCount}/2)`);if(S.flags.lasting)out.push('Lasting Impression');if(S.flags.backBasics)out.push('Back to Basics');if(S.flags.scoldLayer!==null)out.push('Scolding');if(S.flags.notSoFast)out.push('Not So Fast');if(S.flags.bendLong)out.push('Bend Over +1 Long');return out}
 
@@ -786,14 +858,23 @@ function render(){if(!S)return;$('#setup').classList.add('hidden');$('#game').cl
  $('#supplyStatus').textContent=S.taken?'Required card taken ✓':'1 card still required';
  $('#supply').innerHTML=S.supply.length?S.supply.map((c,i)=>`<div class="supply-choice rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3">${cardVisual(c,false)}<button type="button" data-supply="${i}" ${S.taken?'disabled':''} class="supply-take mt-3 min-h-11 w-full rounded-lg border border-[var(--viz-border)] px-3 font-semibold disabled:opacity-40">Take into hand</button></div>`).join(''):'<div class="text-sm text-[var(--viz-muted)]">No face-up cards remain.</div>';
  $('#handTitle').textContent=`${P().name} hand · ${P().hand.length} cards`;$('#deckInfo').textContent=`Deck ${P().deck.length} · discard ${P().discard.length} · removed ${S.removed.length}`;
- let res=$('#resolving');if(S.pending){res.classList.remove('hidden');res.innerHTML=pendingHtml()}else{res.classList.add('hidden');res.innerHTML=''}
+ let res=$('#resolving'),modal=$('#choiceModal'),modalBody=$('#choiceModalBody');
+ if(isUtilityPending(S.pending)){
+   res.classList.add('hidden');res.innerHTML='';
+   modal.classList.remove('hidden');modalBody.innerHTML=utilityChoiceHtml(S.pending);
+   document.body.classList.add('choice-open');
+ }else{
+   modal.classList.add('hidden');modalBody.innerHTML='';
+   document.body.classList.remove('choice-open');
+   if(S.pending){res.classList.remove('hidden');res.innerHTML=pendingHtml()}else{res.classList.add('hidden');res.innerHTML=''}
+ }
  $('#hand').innerHTML=P().hand.length?P().hand.map((c,i)=>cardVisual(c,true,i,'card')).join(''):'<div class="text-sm text-[var(--viz-muted)]">No cards in hand.</div>';
  let flags=activeFlags();$('#stateSummary').innerHTML=`<b>Broken Pile:</b> ${S.broken.length?S.broken.map(c=>esc(c.name)).join(', '):'empty'}<br><b>Removed by Refine:</b> ${S.removed.length?S.removed.map(c=>esc(c.name)).join(', '):'none'}<br><b>Active effects:</b> ${flags.length?flags.map(esc).join(', '):'none'}<br><b>Supply composition:</b> ${S.composition.map(esc).join(', ')}`;
  $('#log').innerHTML=S.log.slice(0,20).map(x=>`<div>${esc(x)}</div>`).join('');
  if(S.win)notice('Victory — the fourth Bottom has been Punished.');if(S.loss)notice('Defeat — the Supply Closet ran out.')
 }
 
-root.addEventListener('click',e=>{let b=e.target.closest('button');if(!b)return;if(b.dataset.card!==undefined)playFromHand(Number(b.dataset.card));else if(b.dataset.supply!==undefined)takeSupply(Number(b.dataset.supply));else if(b.dataset.choice!==undefined)resolvePending(Number(b.dataset.choice))});
+root.addEventListener('click',e=>{let b=e.target.closest('button');if(!b)return;if(b.dataset.card!==undefined)playFromHand(Number(b.dataset.card));else if(b.dataset.supply!==undefined)takeSupply(Number(b.dataset.supply));else if(b.dataset.choice!==undefined)resolvePending(Number(b.dataset.choice));else if(b.dataset.cancelUtility!==undefined)cancelUtilityPending()});
 $('#focusBtn').addEventListener('click',focus);$('#refineBtn').addEventListener('click',refine);$('#repairBtn').addEventListener('click',repair);
 $('#setupForm').addEventListener('submit',e=>{e.preventDefault();try{newGame(Math.max(1,Math.min(4,Number($('#playerCount').value)||1)))}catch(err){console.error(err);const n=$('#notice');if(n){n.textContent='Could not start game: '+(err&&err.message?err.message:String(err));n.classList.remove('hidden');}else{alert('Could not start game: '+(err&&err.message?err.message:String(err)));}}});
 $('#endTurnBtn').addEventListener('click',endTurn);$('#undoBtn').addEventListener('click',()=>{if(!H.length)return notice('Nothing to undo.');S=H.pop();render()});
