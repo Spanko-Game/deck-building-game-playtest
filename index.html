@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f3d48"><title>Deck Building Game — Rules 1.2 Mobile Hand Grid</title><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f3d48"><title>Deck Building Game — Rules 1.2 Mobile Choices Fix</title><style>
 :root{
   --viz-text:#2c211c;--viz-muted:#78665c;--viz-card:#fffaf2;--viz-panel:#f7efe4;
   --viz-border:#ddcdbd;--viz-accent:#8f3d48;--viz-accent-bg:#8f3d48;
@@ -51,131 +51,99 @@ section>div:first-child>.text-xs.uppercase{color:#8f3d48}
 @media(min-width:1024px){.lg\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
 
-.game-card-button{min-width:0}
-.game-card{min-width:0}
-.card-copy{min-width:0}
-.card-title{font-weight:800}
-.card-meta{margin-top:.2rem;font-size:.75rem;font-weight:800;color:var(--viz-muted)}
-.card-effect{margin-top:.65rem;font-size:.9rem;line-height:1.35}
-.card-flavor{margin-top:.7rem;font-size:.86rem;line-height:1.35;font-style:italic;color:var(--viz-muted)}
-.card-art{width:100%;aspect-ratio:3/2;margin-bottom:.7rem}
-.card-art img{width:100%;height:100%;object-fit:cover}
+/* Compact physical-card treatment. */
+#dbg12-art{max-width:100%;overflow-x:hidden}
+.play-card-button,.supply-choice,.play-card{min-width:0;max-width:100%}
+.play-card-copy{min-width:0}
+.play-card-title{font-weight:850;line-height:1.1}
+.play-card-meta{margin-top:.18rem;font-size:.72rem;font-weight:800;color:var(--viz-muted)}
+.play-card-effect{margin-top:.58rem;font-size:.9rem;line-height:1.32}
+.play-card-flavor{margin-top:.65rem;font-size:.8rem;line-height:1.3;font-style:italic;color:var(--viz-muted)}
+.play-card-art{width:100%;aspect-ratio:3/2;margin-bottom:.62rem}
+.play-card-art img{display:block;width:100%;height:100%;object-fit:cover}
 
 @media(max-width:639px){
-  /* Hand: show every choice at once in a 2-column physical-card grid. */
-  #hand{
+  /* All choices are visible together. No sideways page or card-row scrolling. */
+  #supply,#hand{
     display:grid!important;
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
     gap:.55rem!important;
     overflow:visible!important;
-    scroll-snap-type:none!important;
+    width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
     padding-bottom:0!important;
   }
-  #hand>button{
+  #supply>div,#hand>button{
     min-width:0!important;
     max-width:none!important;
-    width:auto!important;
+    width:100%!important;
     flex:none!important;
-    scroll-snap-align:none!important;
-    aspect-ratio:5/7;
-    padding:.55rem!important;
+    padding:.62rem!important;
   }
-  #hand .game-card{
+
+  /* Hand cards: card-like, but intentionally compact enough to scan 4–5 choices. */
+  #hand .play-card-button{
+    min-height:190px;
+  }
+  #hand .play-card{
     height:100%;
     display:flex;
     flex-direction:column;
   }
-  #hand .game-card.text-only .card-copy{
-    height:100%;
+  #hand .play-card-copy{
+    flex:1;
     display:flex;
     flex-direction:column;
-    padding:.15rem;
   }
-  #hand .game-card.text-only .card-title{
-    font-size:1rem;
-    line-height:1.1;
-  }
-  #hand .game-card.text-only .card-meta{
-    font-size:.65rem;
-    letter-spacing:.025em;
-  }
-  #hand .game-card.text-only .card-effect{
-    margin-top:auto;
-    margin-bottom:auto;
-    font-size:1rem;
+  #hand .play-card-title{font-size:.98rem}
+  #hand .play-card-meta{font-size:.61rem;letter-spacing:.02em}
+  #hand .play-card-effect{
+    margin-top:.72rem;
+    font-size:.92rem;
     line-height:1.28;
     font-weight:650;
   }
-  #hand .game-card.text-only .card-flavor{
+  #hand .text-card .play-card-effect{
     margin-top:auto;
-    font-size:.72rem;
-    line-height:1.28;
+    margin-bottom:auto;
   }
-  #hand .game-card.has-art .card-art{
-    flex:0 0 auto;
+  #hand .play-card-flavor{
+    margin-top:auto;
+    padding-top:.55rem;
+    font-size:.69rem;
+    line-height:1.26;
+  }
+
+  /* Implements get the wide physical-game art window, but do not become giant. */
+  #hand .implement-card .play-card-art{
     margin-bottom:.5rem;
   }
-  #hand .game-card.has-art .card-copy{
-    display:flex;
-    flex:1;
-    flex-direction:column;
-    min-height:0;
-  }
-  #hand .game-card.has-art .card-title{font-size:.92rem}
-  #hand .game-card.has-art .card-meta{font-size:.62rem}
-  #hand .game-card.has-art .card-effect{font-size:.82rem;margin-top:.4rem}
-  #hand .game-card.has-art .card-flavor{
-    margin-top:auto;
-    font-size:.68rem;
-    line-height:1.22;
+  #hand .implement-card .play-card-effect{
+    margin-top:.4rem;
+    font-size:.8rem;
   }
 
-  /* Supply Closet: no sideways hunt. Show all 2–3 face-up cards as a grid. */
-  #supply{
-    display:grid!important;
-    grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    gap:.55rem!important;
-    overflow:visible!important;
-    scroll-snap-type:none!important;
-    padding-bottom:0!important;
-  }
-  #supply>div{
-    min-width:0!important;
-    max-width:none!important;
-    width:auto!important;
-    flex:none!important;
-    scroll-snap-align:none!important;
-    padding:.55rem!important;
-  }
-  #supply .supply-card:nth-child(3):last-child{
-    grid-column:1/-1;
-    width:calc(50% - .275rem)!important;
-    justify-self:center;
-  }
-  #supply .game-card .card-title{font-size:.9rem}
-  #supply .game-card .card-meta{font-size:.61rem}
-  #supply .game-card .card-effect{font-size:.78rem;margin-top:.4rem}
-  #supply .game-card .card-flavor{font-size:.68rem;line-height:1.25}
-  #supply .card-art{margin-bottom:.45rem}
-  #supply .supply-take{font-size:.8rem;padding:.45rem .35rem;min-height:42px;margin-top:.55rem}
+  /* Supply Closet: show the whole market at once, with compact readable cards. */
+  #supply .supply-choice{display:flex;flex-direction:column}
+  #supply .play-card{flex:1}
+  #supply .play-card-title{font-size:.9rem}
+  #supply .play-card-meta{font-size:.59rem}
+  #supply .play-card-effect{font-size:.78rem;line-height:1.27;margin-top:.4rem}
+  #supply .play-card-flavor{font-size:.66rem;line-height:1.24}
+  #supply .text-card{min-height:135px}
+  #supply .text-card .play-card-copy{height:100%;display:flex;flex-direction:column}
+  #supply .text-card .play-card-effect{margin-top:auto;margin-bottom:auto;font-weight:650}
+  #supply .supply-take{margin-top:.5rem!important;min-height:42px;font-size:.78rem;padding:.4rem}
 
-  /* Keep text-only cards visually full even without art. */
-  #supply .game-card.text-only{
-    min-height:180px;
-    display:flex;
+  /* With 3 Supply cards, keep the third normal-sized rather than stretching full width. */
+  #supply .supply-choice:nth-child(3):last-child{grid-column:auto}
+
+  /* Stop long rule text from forcing columns wider than the phone. */
+  .play-card-effect,.play-card-flavor,.play-card-title{
+    overflow-wrap:anywhere;
+    word-break:normal;
   }
-  #supply .game-card.text-only .card-copy{
-    display:flex;
-    flex:1;
-    flex-direction:column;
-  }
-  #supply .game-card.text-only .card-effect{
-    margin-top:auto;
-    margin-bottom:auto;
-    font-size:.9rem;
-    font-weight:650;
-  }
-  #supply .game-card.text-only .card-flavor{margin-top:auto}
 }
 
 #mobileHud{display:none}
@@ -235,10 +203,6 @@ section>div:first-child>.text-xs.uppercase{color:#8f3d48}
  #game>section:nth-of-type(2) button{min-height:58px!important;padding:.5rem!important;text-align:center}
  #game>section:nth-of-type(2) button .mt-1{display:none}
 
- #supply,#hand{display:flex!important;overflow-x:auto;scroll-snap-type:x mandatory;gap:.7rem;padding-bottom:.4rem;margin-left:-.1rem;margin-right:-.1rem}
- #supply>div,#hand>button{min-width:78vw;max-width:78vw;scroll-snap-align:center;flex:0 0 78vw}
- #supply img,#hand img{width:100%;height:auto;aspect-ratio:3/2;object-fit:cover}
- #supply>div,#hand>button{padding:.72rem}
 
  #resolving .grid{grid-template-columns:1fr!important}
  #endTurnBtn{position:sticky;bottom:8px;z-index:20;box-shadow:0 8px 25px rgba(0,0,0,.18)}
@@ -692,20 +656,20 @@ function cardVisual(c,button=false,index=0,zone='card'){
  let img='';
  if(c.implement){
    img=hasArt(c.name)
-     ?`<div class="card-art overflow-hidden rounded-lg">${artImg(c.name,'w-full object-cover')}</div>`
-     :`<div class="card-art art-placeholder">Art placeholder</div>`;
+     ?`<div class="play-card-art overflow-hidden rounded-lg">${artImg(c.name,'w-full object-cover')}</div>`
+     :`<div class="play-card-art art-placeholder">Art placeholder</div>`;
  }
  let meta=c.implement?`${esc(c.reach)} IMPLEMENT · ${esc(c.type)}`:'DISCIPLINE CARD';
- let body=`<div class="game-card ${c.implement?'has-art':'text-only'}">
+ let body=`<div class="play-card ${c.implement?'implement-card':'text-card'}">
    ${img}
-   <div class="card-copy">
-     <div class="card-title">${esc(c.name)}</div>
-     <div class="card-meta">${meta}</div>
-     <div class="card-effect">${esc(c.effect)}</div>
-     ${c.flavor?`<div class="card-flavor">${esc(c.flavor)}</div>`:''}
+   <div class="play-card-copy">
+     <div class="play-card-title">${esc(c.name)}</div>
+     <div class="play-card-meta">${meta}</div>
+     <div class="play-card-effect">${esc(c.effect)}</div>
+     ${c.flavor?`<div class="play-card-flavor">${esc(c.flavor)}</div>`:''}
    </div>
  </div>`;
- if(button)return `<button type="button" data-${zone}="${index}" ${S.discipline<1||S.pending||S.ended?'disabled':''} class="game-card-button rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3 text-left disabled:opacity-40">${body}</button>`;
+ if(button)return `<button type="button" data-${zone}="${index}" ${S.discipline<1||S.pending||S.ended?'disabled':''} class="play-card-button rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3 text-left disabled:opacity-40">${body}</button>`;
  return body;
 }
 function pendingHtml(){if(!S.pending)return'';let q=S.pending;let img=q.card&&hasArt(q.card.name)?`<div class="mb-3 max-w-[180px]">${artImg(q.card.name)}</div>`:'';return `${img}<div class="text-xs font-semibold uppercase tracking-wide text-[var(--viz-muted)]">Resolving</div><div class="mt-1 font-semibold">${esc(q.title)}</div>${q.card?`<div class="mt-1 text-sm">${esc(q.card.effect)}</div>`:''}<div class="mt-3 grid gap-2 sm:grid-cols-2">${q.options.map((o,i)=>`<button type="button" data-choice="${i}" class="min-h-11 rounded-lg border border-[var(--viz-border)] bg-[var(--viz-card)] p-3 text-left"><div class="font-semibold">${esc(o.label)}</div>${o.sub?`<div class="mt-1 text-sm text-[var(--viz-muted)]">${esc(o.sub)}</div>`:''}</button>`).join('')}</div>`}
@@ -731,7 +695,7 @@ function render(){if(!S)return;$('#setup').classList.add('hidden');$('#game').cl
  $('#layers').innerHTML=['Clothing','Underwear','Bare'].map((x,i)=>`<div class="rounded-lg ${i===li()?'border-2 border-[var(--viz-accent)]':'border border-[var(--viz-border)]'} bg-[var(--viz-panel)] p-3"><div class="text-xs font-semibold text-[var(--viz-muted)]">${x}${i===li()?' · CURRENT':''}</div><div class="mt-1 text-xl font-semibold">${S.layers[i].current} / ${S.layers[i].start}</div></div>`).join('');
  $('#focusBtn').disabled=!S.utility;$('#refineBtn').disabled=!S.utility||!P().discard.some(c=>c.basic);$('#repairBtn').disabled=!S.utility||!S.broken.length;
  $('#supplyStatus').textContent=S.taken?'Required card taken ✓':'1 card still required';
- $('#supply').innerHTML=S.supply.length?S.supply.map((c,i)=>`<div class="supply-card rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3">${cardVisual(c,false)}<button type="button" data-supply="${i}" ${S.taken?'disabled':''} class="supply-take mt-3 min-h-11 w-full rounded-lg border border-[var(--viz-border)] px-3 font-semibold disabled:opacity-40">Take into hand</button></div>`).join(''):'<div class="text-sm text-[var(--viz-muted)]">No face-up cards remain.</div>';
+ $('#supply').innerHTML=S.supply.length?S.supply.map((c,i)=>`<div class="supply-choice rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3">${cardVisual(c,false)}<button type="button" data-supply="${i}" ${S.taken?'disabled':''} class="supply-take mt-3 min-h-11 w-full rounded-lg border border-[var(--viz-border)] px-3 font-semibold disabled:opacity-40">Take into hand</button></div>`).join(''):'<div class="text-sm text-[var(--viz-muted)]">No face-up cards remain.</div>';
  $('#handTitle').textContent=`${P().name} hand · ${P().hand.length} cards`;$('#deckInfo').textContent=`Deck ${P().deck.length} · discard ${P().discard.length} · removed ${S.removed.length}`;
  let res=$('#resolving');if(S.pending){res.classList.remove('hidden');res.innerHTML=pendingHtml()}else{res.classList.add('hidden');res.innerHTML=''}
  $('#hand').innerHTML=P().hand.length?P().hand.map((c,i)=>cardVisual(c,true,i,'card')).join(''):'<div class="text-sm text-[var(--viz-muted)]">No cards in hand.</div>';
