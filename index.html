@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f3d48"><title>Deck Building Game — Rules 1.2 Utility Menus</title><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f3d48"><title>Spanko — Cooperative Deck-Building Game</title><style>
 :root{
   --viz-text:#2c211c;--viz-muted:#78665c;--viz-card:#fffaf2;--viz-panel:#f7efe4;
   --viz-border:#ddcdbd;--viz-accent:#8f3d48;--viz-accent-bg:#8f3d48;
@@ -344,19 +344,97 @@ body.choice-open{overflow:hidden}
   .choice-sheet{bottom:50%;transform:translate(-50%,50%);border-radius:1.1rem;max-height:70vh}
 }
 
+
+/* Intro / rules / result shell */
+.intro-screen{
+  max-width:720px;margin:28px auto 0;border:1px solid var(--viz-border);border-radius:1.3rem;
+  background:var(--viz-card);padding:clamp(1.2rem,4vw,2rem);box-shadow:var(--shadow)
+}
+.intro-kicker,.rules-kicker,.end-eyebrow{color:var(--viz-accent);font-size:.72rem;font-weight:900;letter-spacing:.09em}
+.intro-title{margin:.35rem 0 .7rem;font-size:clamp(2rem,8vw,3.5rem);line-height:.98;letter-spacing:-.04em;text-align:center}
+.intro-copy{max-width:620px;margin:0;color:var(--viz-muted);font-size:1rem;line-height:1.5}
+.intro-how{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem;margin:1.1rem 0}
+.intro-how>div{display:flex;gap:.55rem;align-items:flex-start;background:var(--viz-panel);border-radius:.8rem;padding:.75rem;font-size:.83rem;line-height:1.3}
+.intro-how strong{color:var(--viz-accent);font-size:1rem}
+.intro-start{display:grid;grid-template-columns:minmax(120px,160px) 1fr auto;gap:.55rem;align-items:end;margin-top:1rem}
+.intro-label{font-size:.78rem;font-weight:800;color:var(--viz-muted)}
+.intro-select{display:block;width:100%;min-height:48px;margin-top:.28rem;border:1px solid var(--viz-border);background:var(--viz-panel);border-radius:.8rem;padding:.65rem;font-size:1rem}
+.intro-primary,.end-primary{min-height:48px;border:0!important;border-radius:.8rem!important;background:var(--viz-accent-bg)!important;color:white!important;font-weight:850;padding:.7rem 1rem}
+.intro-secondary,.end-secondary{min-height:48px;border:1px solid var(--viz-border)!important;border-radius:.8rem!important;background:transparent!important;font-weight:800;padding:.7rem 1rem}
+.intro-version{text-align:center;margin-top:1rem;color:var(--viz-muted);font-size:.7rem}
+.hudRight{display:flex;align-items:center;gap:.35rem}
+.hudRules{width:30px;height:30px;min-height:30px;padding:0!important;border-radius:999px!important;font-weight:900;background:var(--viz-panel)!important}
+
+.rules-modal{position:fixed;inset:0;z-index:160}
+.rules-modal.hidden{display:none}
+.rules-backdrop{position:absolute;inset:0;background:rgba(38,28,24,.52)}
+.rules-sheet{
+  position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+  width:min(760px,100%);max-height:88vh;overflow:auto;background:var(--viz-card);
+  border:1px solid var(--viz-border);border-radius:1.15rem 1.15rem 0 0;
+  padding:1rem 1rem calc(1.2rem + env(safe-area-inset-bottom));box-shadow:0 -16px 42px rgba(49,30,23,.24)
+}
+.rules-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:.8rem}
+.rules-title{font-size:1.45rem;font-weight:900}
+.rules-close{width:44px;height:44px;padding:0!important;border-radius:999px!important;font-size:1.65rem;background:var(--viz-panel)!important}
+.rules-objective{background:var(--viz-panel);border-radius:.8rem;padding:.75rem;font-size:.9rem;line-height:1.4;margin-bottom:.7rem}
+.rules-sheet details{box-shadow:none!important;border-top:1px solid var(--viz-border);padding:.72rem .1rem!important}
+.rules-sheet details:last-child{border-bottom:1px solid var(--viz-border)}
+.rules-sheet summary{cursor:pointer;font-weight:850;font-size:.95rem}
+.rules-body{padding:.45rem .1rem 0;color:var(--viz-muted);font-size:.86rem;line-height:1.45}
+.rules-body p{margin:.35rem 0}
+
+.end-screen{max-width:720px;margin:28px auto 0}
+.end-card{background:var(--viz-card);border:1px solid var(--viz-border);border-radius:1.3rem;padding:clamp(1.2rem,4vw,2rem);box-shadow:var(--shadow);text-align:center}
+.end-title{margin:.28rem 0 .35rem;font-size:clamp(2.1rem,9vw,4rem);font-weight:950;line-height:1;letter-spacing:-.045em}
+.end-summary{margin:.4rem auto 1rem;max-width:520px;color:var(--viz-muted);line-height:1.45}
+.end-bottoms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem;text-align:left}
+.end-bottom{background:var(--viz-panel);border-radius:.8rem;padding:.75rem}
+.end-bottom-order{font-size:.65rem;font-weight:850;color:var(--viz-muted);text-transform:uppercase;letter-spacing:.05em}
+.end-bottom-name{font-size:.98rem;font-weight:850;margin-top:.15rem}
+.end-bottom-turns{font-size:.82rem;color:var(--viz-muted);margin-top:.18rem}
+.end-actions{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;margin-top:1rem}
+.end-actions .end-primary{grid-column:1/-1}
+body.overlay-open{overflow:hidden}
+
+@media(min-width:640px){
+  .rules-sheet{bottom:50%;transform:translate(-50%,50%);border-radius:1.15rem;max-height:82vh}
+}
+@media(max-width:639px){
+  body{padding:10px}
+  .intro-screen{margin:4px auto 0;padding:1rem}
+  .intro-how{grid-template-columns:1fr}
+  .intro-start{grid-template-columns:1fr 1fr}
+  .intro-label{grid-column:1/-1}
+  .intro-primary{grid-column:1/2}
+  .intro-secondary{grid-column:2/3}
+  .end-screen{margin:4px auto 0}
+}
+
 </style></head><body>
 <div id="dbg12-art" class="w-full space-y-4 text-[var(--viz-text)]">
-  <div id="setup" class="rounded-xl border border-[var(--viz-border)] bg-[var(--viz-card)] p-4">
-    <div class="text-lg font-semibold">Rules 1.2 Playtest</div>
-    <p class="mt-1 text-sm text-[var(--viz-muted)]">Uses the current 1.2 card data and displays your saved art whenever a matching component appears.</p>
-    <form id="setupForm" class="mt-4 flex flex-wrap items-end gap-3">
-      <label class="text-sm font-medium">Players
-        <select id="playerCount" class="mt-1 block min-h-11 rounded-lg border border-[var(--viz-border)] bg-[var(--viz-panel)] px-3 text-base">
+  <div id="setup" class="intro-screen">
+    <div class="intro-kicker">A COOPERATIVE DECK-BUILDING GAME</div>
+    <h1 class="intro-title">Spanko</h1>
+    <p class="intro-copy">Work together to play Discipline cards, remove each Bottom’s clothing layer by layer, and Punish four Bottoms before the 20-card Supply Closet runs out. Build stronger decks, manage Position, and make every Discipline Action count.</p>
+
+    <div class="intro-how">
+      <div><strong>1.</strong><span>Take exactly 1 face-up Supply Closet card each turn.</span></div>
+      <div><strong>2.</strong><span>Use up to 1 Utility Action and your available Discipline Actions.</span></div>
+      <div><strong>3.</strong><span>Use Discipline cards to punish Bottoms, removing each clothing layer until their bare bottom is thoroughly spanked and their Composure is gone.</span></div>
+      <div><strong>4.</strong><span>Punish all 4 Bottoms before the Supply Closet is exhausted.</span></div>
+    </div>
+
+    <form id="setupForm" class="intro-start">
+      <label class="intro-label">Players
+        <select id="playerCount" class="intro-select">
           <option value="1">1 player</option><option value="2">2 players</option><option value="3">3 players</option><option value="4">4 players</option>
         </select>
       </label>
-      <button type="submit" class="min-h-11 rounded-lg bg-[var(--viz-accent-bg)] px-4 font-semibold">Start randomized game</button>
+      <button type="submit" class="intro-primary">Start randomized game</button>
+      <button id="introRulesBtn" type="button" class="intro-secondary">How to Play</button>
     </form>
+    <div class="intro-version">Rules 1.2 playtest</div>
   </div>
 
   <div id="game" class="hidden space-y-4">
@@ -366,7 +444,10 @@ body.choice-open{overflow:hidden}
           <span id="hudTurn"></span>
           <strong id="hudBottom"></strong>
         </div>
-        <div id="hudSupply" class="hudSupply"></div>
+        <div class="hudRight">
+          <div id="hudSupply" class="hudSupply"></div>
+          <button id="hudRulesBtn" type="button" class="hudRules" aria-label="Open rules">?</button>
+        </div>
       </div>
       <div class="hudState">
         <span id="hudLayer"></span>
@@ -437,7 +518,7 @@ body.choice-open{overflow:hidden}
     <section class="rounded-xl border border-[var(--viz-border)] bg-[var(--viz-card)] p-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div><div id="handTitle" class="font-semibold"></div><div id="deckInfo" class="text-sm text-[var(--viz-muted)]"></div></div>
-        <div class="flex flex-wrap gap-2"><button id="undoBtn" type="button" class="min-h-11 rounded-lg border border-[var(--viz-border)] px-3">Undo</button><button id="endTurnBtn" type="button" class="min-h-11 rounded-lg bg-[var(--viz-accent-bg)] px-4 font-semibold">End turn</button></div>
+        <div class="flex flex-wrap gap-2"><button id="gameRulesBtn" type="button" class="min-h-11 rounded-lg border border-[var(--viz-border)] px-3">Rules</button><button id="undoBtn" type="button" class="min-h-11 rounded-lg border border-[var(--viz-border)] px-3">Undo</button><button id="endTurnBtn" type="button" class="min-h-11 rounded-lg bg-[var(--viz-accent-bg)] px-4 font-semibold">End turn</button></div>
       </div>
       <div class="mt-2 text-sm text-[var(--viz-muted)]">Tap a card to play it. All playable cards are Discipline Cards and normally use 1 Discipline Action.</div>
       <div id="resolving" class="hidden mt-3 rounded-xl border-2 border-[var(--viz-accent)] bg-[var(--viz-panel)] p-4"></div>
@@ -454,6 +535,88 @@ body.choice-open{overflow:hidden}
       <button id="restartBtn" type="button" class="min-h-11 rounded-lg border border-[var(--viz-border)] px-3">Restart</button>
       <button id="minusBtn" type="button" class="min-h-11 rounded-lg border border-[var(--viz-border)] px-3">Manual −1 Composure</button>
       <button id="plusBtn" type="button" class="min-h-11 rounded-lg border border-[var(--viz-border)] px-3">Manual +1 Composure</button>
+    </div>
+  </div>
+
+  <div id="endScreen" class="end-screen hidden" aria-live="polite">
+    <div class="end-card">
+      <div id="endEyebrow" class="end-eyebrow"></div>
+      <div id="endTitle" class="end-title"></div>
+      <p id="endSummary" class="end-summary"></p>
+      <div id="endBottoms" class="end-bottoms"></div>
+      <div class="end-actions">
+        <button id="playAgainBtn" type="button" class="end-primary">Play again</button>
+        <button id="changePlayersBtn" type="button" class="end-secondary">Change players</button>
+        <button id="endRulesBtn" type="button" class="end-secondary">Rules</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="rulesModal" class="rules-modal hidden" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
+    <div class="rules-backdrop" data-close-rules="1"></div>
+    <div class="rules-sheet">
+      <div class="rules-head">
+        <div>
+          <div class="rules-kicker">QUICK REFERENCE</div>
+          <div id="rulesTitle" class="rules-title">How to Play</div>
+        </div>
+        <button id="closeRulesBtn" type="button" class="rules-close" aria-label="Close rules">×</button>
+      </div>
+
+      <div class="rules-objective"><strong>Objective:</strong> Cooperate to Punish 4 Bottoms before the 20-card Supply Closet runs out.</div>
+
+      <details open>
+        <summary>Turn structure</summary>
+        <div class="rules-body">
+          <p>At the start of the turn, refill empty face-up Supply Closet slots to the current display limit.</p>
+          <p>You normally have <strong>1 Utility Action</strong> and <strong>3 Discipline Actions</strong>. After the third Bottom is Punished, you have 4 Discipline Actions.</p>
+          <p>During every turn you must take <strong>exactly 1 face-up Supply Closet card</strong>. Taking it does not use an action.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Utility Actions</summary>
+        <div class="rules-body">
+          <p>You may use up to one built-in Utility Action each turn. These are not cards.</p>
+          <p><strong>Focus:</strong> Draw 1 card, then discard 1 card.</p>
+          <p><strong>Refine:</strong> Permanently remove 1 Basic card from your discard pile.</p>
+          <p><strong>Repair:</strong> Repair 1 Broken Implement and put it into your discard pile.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Discipline Cards & Layers</summary>
+        <div class="rules-body">
+          <p>Every playable card is a Discipline Card. Playing one normally uses 1 Discipline Action.</p>
+          <p>A Bottom has three Layers in order: <strong>Clothing → Underwear → Bare</strong>. Impact reduces the current Layer's Composure. Excess Impact carries into the next Layer.</p>
+          <p>When you break at least one Layer, you normally cannot take any more Discipline Actions that turn. A remaining Utility Action may still be used.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Position</summary>
+        <div class="rules-body">
+          <p>A Bottom may be <strong>OTK</strong>, <strong>Bent Over</strong>, or unpositioned. Position is shared by all players and remains between turns until consumed or changed.</p>
+          <p>A Position is consumed after a Discipline receives a benefit from it. An effect that only establishes or changes Position does not consume it unless the effect says otherwise.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Implements</summary>
+        <div class="rules-body">
+          <p>Implements have listed Impact, a Favored Position, and a Position Bonus. If the Bottom is in the Favored Position, add the Position Bonus.</p>
+          <p>Implements normally Break after use and go to the shared Broken Pile. The standard Repair Utility Action moves a repaired Implement to your discard pile.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Progression</summary>
+        <div class="rules-body">
+          <p>Start with 2 face-up Supply Closet cards. After Bottom 1, the display limit becomes 3.</p>
+          <p>After Bottom 2, normal hand size increases from 4 to 5. After Bottom 3, normal Discipline Actions increase from 3 to 4.</p>
+          <p>Punish Bottom 4 to win. If the Supply Closet is exhausted before Bottom 4 is Punished, the players lose.</p>
+        </div>
+      </details>
     </div>
   </div>
 
@@ -651,6 +814,54 @@ function startEncounter(){S.bottom=S.bottomDeck.shift();S.layers=makeLayers(S.bo
 function refillSupply(){let limit=S.punished>=1?3:2;while(S.supply.length<limit&&S.supplyDeck.length)S.supply.push(S.supplyDeck.shift())}
 function resetTurnFlags(){let scoldLayer=(S.flags&&Number.isInteger(S.flags.scoldLayer))?S.flags.scoldLayer:null;S.flags={firstDiscipline:true,settle:false,perfectPosition:null,dontMove:false,built:false,oneMore:false,grip:null,continueAfterBreak:false,followThrough:false,makeItCount:false,goodMeasure:false,goodCount:0,lasting:false,backBasics:false,scoldLayer:scoldLayer,notSoFast:false,bendLong:false}}
 function startTurn(first=false){if(!first&&S.ended&&!S.win)startEncounter();refillSupply();S.utility=1;S.discipline=S.punished>=3?4:3;S.taken=false;S.pending=null;resetTurnFlags();if(S.bottom.name==='Real Estate Agent'){S.location=randomLocation();log(`Open House changes the Location to ${S.location.name}.`)}}
+
+function openRules(){
+ const m=$('#rulesModal');
+ if(!m)return;
+ m.classList.remove('hidden');
+ document.body.classList.add('overlay-open');
+}
+function closeRules(){
+ const m=$('#rulesModal');
+ if(!m)return;
+ m.classList.add('hidden');
+ document.body.classList.remove('overlay-open');
+}
+function showIntro(){
+ closeRules();
+ $('#endScreen').classList.add('hidden');
+ $('#game').classList.add('hidden');
+ $('#setup').classList.remove('hidden');
+ window.scrollTo(0,0);
+}
+function renderEndScreen(){
+ const end=$('#endScreen');
+ if(!S||(!S.win&&!S.loss)){end.classList.add('hidden');return false}
+ $('#setup').classList.add('hidden');
+ $('#game').classList.add('hidden');
+ end.classList.remove('hidden');
+
+ const rows=(S.analytics&&Array.isArray(S.analytics.bottoms)?S.analytics.bottoms:[])
+   .slice().sort((a,b)=>Number(a.order)-Number(b.order));
+ const total=(S.analytics&&S.analytics.totalTurns)||S.turn;
+
+ $('#endEyebrow').textContent=S.win?'PLAYTEST COMPLETE':'SUPPLY CLOSET EXHAUSTED';
+ $('#endTitle').textContent=S.win?'Victory':'Defeat';
+ $('#endSummary').textContent=S.win
+   ?`All four Bottoms were Punished in ${total} total turn${total===1?'':'s'}.`
+   :`You were unsuccessful as a disciplinarian. Now spend five minutes in the corner and think about your Actions.`;
+
+ $('#endBottoms').innerHTML=rows.map(r=>`
+   <div class="end-bottom">
+     <div class="end-bottom-order">Bottom ${r.order}</div>
+     <div class="end-bottom-name">${esc(r.name)}</div>
+     <div class="end-bottom-turns">${r.status==='failed'?'Not Punished':`${r.turns} turn${Number(r.turns)===1?'':'s'} to Punish`}</div>
+   </div>`).join('');
+
+ window.scrollTo(0,0);
+ return true;
+}
+
 function newGame(n){let chosenI=shuffle(IMPLEMENTS).slice(0,8).map(cp),chosenN=shuffle(NONIMPS).slice(0,12).map(cp);S={players:[],active:0,turn:1,punished:0,bottomDeck:shuffle(BOTTOMS.map(cp)),bottom:null,layers:[],position:null,location:null,supplyDeck:shuffle([...chosenI,...chosenN]),supply:[],broken:[],removed:[],ended:false,win:false,loss:false,finalTaken:false,taken:false,utility:1,discipline:3,pending:null,flags:{},log:[],composition:[...chosenI,...chosenN].map(x=>x.name),analytics:analyticsStartGame(n)};for(let i=0;i<n;i++){let p={name:`Player ${i+1}`,deck:shuffle(STARTING.map(cp)),discard:[],hand:[],acquired:[]};drawTo(p,4);S.players.push(p)}startEncounter();refillSupply();startTurn(true);analyticsSaveDraft();render()}
 
 function openPending(type,card,title,options,extra={}){S.pending={type,card,title,options,...extra};render()}
@@ -837,7 +1048,7 @@ function cancelUtilityPending(){
 function traitText(){let t=activeLayerTrait();return t?`${lname()} Trait — ${t.name}: ${t.effect}`:'Underwear — no additional Layer Trait.'}
 function activeFlags(){let out=[];if(S.flags.settle)out.push('Settle In');if(S.flags.perfectPosition)out.push(`Perfect Setup (${S.flags.perfectPosition})`);if(S.flags.dontMove)out.push('Don’t Move');if(S.flags.built)out.push('Built to Last');if(S.flags.oneMore)out.push('One More');if(S.flags.grip)out.push('Change Your Grip');if(S.flags.continueAfterBreak)out.push('Not Finished Yet');if(S.flags.followThrough)out.push('Follow Through');if(S.flags.makeItCount)out.push('Make It Count');if(S.flags.goodMeasure)out.push(`For Good Measure (${S.flags.goodCount}/2)`);if(S.flags.lasting)out.push('Lasting Impression');if(S.flags.backBasics)out.push('Back to Basics');if(S.flags.scoldLayer!==null)out.push('Scolding');if(S.flags.notSoFast)out.push('Not So Fast');if(S.flags.bendLong)out.push('Bend Over +1 Long');return out}
 
-function render(){if(!S)return;$('#setup').classList.add('hidden');$('#game').classList.remove('hidden');
+function render(){if(!S)return;if(S.win||S.loss){renderEndScreen();return}$('#endScreen').classList.add('hidden');$('#setup').classList.add('hidden');$('#game').classList.remove('hidden');
  $('#turnLabel').textContent=`Turn ${S.turn} · ${P().name}`;$('#bottomName').textContent=S.bottom.name;$('#bottomFlavor').textContent=S.bottom.flavor;
  $('#bottomArt').innerHTML=hasArt(S.bottom.name)?artImg(S.bottom.name,'w-full rounded-lg object-cover'):`<div class="art-placeholder">Art placeholder</div>`;
  $('#persistentTrait').textContent=`Persistent Trait — ${S.bottom.persistent.name}: ${S.bottom.persistent.effect}${persistentIgnored()?' (ignored for this Layer)':''}`;
@@ -878,9 +1089,19 @@ root.addEventListener('click',e=>{let b=e.target.closest('button');if(!b)return;
 $('#focusBtn').addEventListener('click',focus);$('#refineBtn').addEventListener('click',refine);$('#repairBtn').addEventListener('click',repair);
 $('#setupForm').addEventListener('submit',e=>{e.preventDefault();try{newGame(Math.max(1,Math.min(4,Number($('#playerCount').value)||1)))}catch(err){console.error(err);const n=$('#notice');if(n){n.textContent='Could not start game: '+(err&&err.message?err.message:String(err));n.classList.remove('hidden');}else{alert('Could not start game: '+(err&&err.message?err.message:String(err)));}}});
 $('#endTurnBtn').addEventListener('click',endTurn);$('#undoBtn').addEventListener('click',()=>{if(!H.length)return notice('Nothing to undo.');S=H.pop();render()});
-$('#restartBtn').addEventListener('click',()=>{S=null;H=[];$('#game').classList.add('hidden');$('#setup').classList.remove('hidden')});
+$('#restartBtn').addEventListener('click',()=>{S=null;H=[];showIntro()});
 $('#minusBtn').addEventListener('click',()=>{if(!S||S.ended)return;save();applyImpact(1,'Manual adjustment');render()});
 $('#plusBtn').addEventListener('click',()=>{if(!S||S.ended)return;save();recover(1,'Manual adjustment');render()});
+
+$('#introRulesBtn').addEventListener('click',openRules);
+$('#hudRulesBtn').addEventListener('click',openRules);
+$('#gameRulesBtn').addEventListener('click',openRules);
+$('#endRulesBtn').addEventListener('click',openRules);
+$('#closeRulesBtn').addEventListener('click',closeRules);
+$('#rulesModal').addEventListener('click',e=>{if(e.target.closest('[data-close-rules]'))closeRules()});
+$('#playAgainBtn').addEventListener('click',()=>{let n=(S&&S.players&&S.players.length)||Number($('#playerCount').value)||1;newGame(n);window.scrollTo(0,0)});
+$('#changePlayersBtn').addEventListener('click',showIntro);
+
 })();
 </script>
 </div>
