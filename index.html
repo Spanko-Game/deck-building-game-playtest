@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f3d48"><title>Deck Building Game — Rules 1.2 Mobile Choices Fix</title><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f3d48"><title>Deck Building Game — Rules 1.2 Mobile Sticky Fix</title><style>
 :root{
   --viz-text:#2c211c;--viz-muted:#78665c;--viz-card:#fffaf2;--viz-panel:#f7efe4;
   --viz-border:#ddcdbd;--viz-accent:#8f3d48;--viz-accent-bg:#8f3d48;
@@ -51,8 +51,11 @@ section>div:first-child>.text-xs.uppercase{color:#8f3d48}
 @media(min-width:1024px){.lg\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
 
+/* Keep the page from drifting sideways without breaking sticky positioning. */
+html,body{max-width:100%;overflow-x:clip}
+
 /* Compact physical-card treatment. */
-#dbg12-art{max-width:100%;overflow-x:hidden}
+#dbg12-art{max-width:100%}
 .play-card-button,.supply-choice,.play-card{min-width:0;max-width:100%}
 .play-card-copy{min-width:0}
 .play-card-title{font-weight:850;line-height:1.1}
@@ -61,6 +64,12 @@ section>div:first-child>.text-xs.uppercase{color:#8f3d48}
 .play-card-flavor{margin-top:.65rem;font-size:.8rem;line-height:1.3;font-style:italic;color:var(--viz-muted)}
 .play-card-art{width:100%;aspect-ratio:3/2;margin-bottom:.62rem}
 .play-card-art img{display:block;width:100%;height:100%;object-fit:cover}
+
+
+@media(max-width:639px){
+  /* The sticky HUD already shows Utility and Discipline counts. */
+  #locationEffect + .grid{display:none!important}
+}
 
 @media(max-width:639px){
   /* All choices are visible together. No sideways page or card-row scrolling. */
@@ -155,7 +164,7 @@ section>div:first-child>.text-xs.uppercase{color:#8f3d48}
 }
 @media(max-width:639px){
  #mobileHud{
-   display:block;position:sticky;top:0;z-index:40;
+   display:block;position:-webkit-sticky;position:sticky;top:0;z-index:60;
    background:rgba(255,250,242,.97);border:1px solid var(--viz-border);
    border-radius:.8rem;padding:.55rem .65rem;
    box-shadow:0 8px 22px rgba(62,38,28,.14);
