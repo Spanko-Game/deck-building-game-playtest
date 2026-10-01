@@ -855,7 +855,7 @@ function renderEndScreen(){
    <div class="end-bottom">
      <div class="end-bottom-order">Bottom ${r.order}</div>
      <div class="end-bottom-name">${esc(r.name)}</div>
-     <div class="end-bottom-turns">${r.status==='failed'?'Not Punished':`${r.turns} turn${Number(r.turns)===1?'':'s'} to Punish`}</div>
+     <div class="end-bottom-turns">${r.status==='failed'?'Not Punished':`Punished in ${r.turns} turn${Number(r.turns)===1?'':'s'}`}</div>
    </div>`).join('');
 
  window.scrollTo(0,0);
@@ -937,13 +937,42 @@ function computeBasic(c){
  return {damage:Math.max(0,base+le.delta+pe.delta),positionBenefit:le.positionBenefit||pe.positionBenefit};
 }
 
+function ensureVictoryState(){
+ if(!S)return false;
+ if(S.punished>=4){
+   S.punished=4;
+   S.win=true;
+   S.loss=false;
+   S.ended=true;
+   if(S.analytics&&S.analytics.result!=='win')analyticsFinalize('win');
+   return true;
+ }
+ return false;
+}
+
 function applyImpact(n,source){if(n<=0||S.ended)return {broke:false};let left=n,broke=false;
  while(left>0&&!S.ended){let i=li();if(i<0)break;let use=Math.min(left,S.layers[i].current);S.layers[i].current-=use;left-=use;
-   if(S.layers[i].current===0){broke=true;let broken=i;log(`${['Clothing','Underwear','Bare'][i]} Layer breaks.`);if(S.flags.scoldLayer===broken)S.flags.scoldLayer=null;
-     if(i===2){S.punished++;S.ended=true;analyticsBottomPunished();log(`${S.bottom.name} is Punished. (${S.punished}/4)`);if(S.punished===4){S.win=true;analyticsFinalize('win');log('Players win!')}break}
+   if(S.layers[i].current===0){
+     broke=true;
+     let broken=i;
+     if(i===0)log('Clothing layer removed.');
+     else if(i===1)log('Underwear layer removed.');
+     else log('Bare layer completed.');
+     if(S.flags.scoldLayer===broken)S.flags.scoldLayer=null;
+     if(i===2){
+       S.punished++;
+       S.ended=true;
+       analyticsBottomPunished();
+       log(`${S.bottom.name} is Punished. (${Math.min(S.punished,4)}/4)`);
+       if(ensureVictoryState())log('Players win!');
+       break;
+     }
    }
  }
- log(`${source} deals ${n} Impact.`);if(broke&&!S.flags.continueAfterBreak)S.discipline=0;return {broke}
+ log(`${source} deals ${n} Impact.`);
+ if(broke&&!S.flags.continueAfterBreak)S.discipline=0;
+ ensureVictoryState();
+ return {broke}
 }
 function recover(n,source){let i=li();if(i<0)return;let before=S.layers[i].current;S.layers[i].current=Math.min(S.layers[i].start,S.layers[i].current+n);if(S.layers[i].current>before)log(`${source} recovers ${S.layers[i].current-before} Composure.`)}
 function consumePosition(benefit,perfectProtect=false){if(!benefit||!S.position)return;if(perfectProtect){log('Perfect Setup prevents the Position from being consumed.');return}if(S.flags.dontMove){S.flags.dontMove=false;log('Don’t Move prevents the Position from being consumed.');return}log(`${S.position} is consumed.`);S.position=null}
@@ -999,7 +1028,7 @@ function takeSupply(i){if(S.taken)return notice('You already took your required 
 function endTurn(){if(S.pending)return notice('Finish resolving the current choice first.');if(!S.taken)return notice('You must take exactly 1 face-up Supply Closet card before ending the turn.');save();
  if(!S.ended){if(li()===0&&S.bottom.clothing.name==='Collected')recover(1,'Collected');if(S.location.name==='Beach House')recover(1,'Beach House')}
  let p=P();p.discard.push(...p.hand.splice(0));let handSize=S.punished>=2?5:4;if(S.location.name==='Office')handSize=Math.max(0,handSize-1);drawTo(p,handSize);
- if(S.finalTaken&&!S.win){S.loss=true;analyticsFinalize('loss');log('Supply Closet exhausted before the fourth Bottom was Punished. Players lose.');render();return}
+ ensureVictoryState();if(S.finalTaken&&!S.win){S.loss=true;analyticsFinalize('loss');log('Supply Closet exhausted before the fourth Bottom was Punished. Players lose.');render();return}
  S.active=(S.active+1)%S.players.length;S.turn++;startTurn(false);render()
 }
 
@@ -1048,7 +1077,7 @@ function cancelUtilityPending(){
 function traitText(){let t=activeLayerTrait();return t?`${lname()} Trait — ${t.name}: ${t.effect}`:'Underwear — no additional Layer Trait.'}
 function activeFlags(){let out=[];if(S.flags.settle)out.push('Settle In');if(S.flags.perfectPosition)out.push(`Perfect Setup (${S.flags.perfectPosition})`);if(S.flags.dontMove)out.push('Don’t Move');if(S.flags.built)out.push('Built to Last');if(S.flags.oneMore)out.push('One More');if(S.flags.grip)out.push('Change Your Grip');if(S.flags.continueAfterBreak)out.push('Not Finished Yet');if(S.flags.followThrough)out.push('Follow Through');if(S.flags.makeItCount)out.push('Make It Count');if(S.flags.goodMeasure)out.push(`For Good Measure (${S.flags.goodCount}/2)`);if(S.flags.lasting)out.push('Lasting Impression');if(S.flags.backBasics)out.push('Back to Basics');if(S.flags.scoldLayer!==null)out.push('Scolding');if(S.flags.notSoFast)out.push('Not So Fast');if(S.flags.bendLong)out.push('Bend Over +1 Long');return out}
 
-function render(){if(!S)return;if(S.win||S.loss){renderEndScreen();return}$('#endScreen').classList.add('hidden');$('#setup').classList.add('hidden');$('#game').classList.remove('hidden');
+function render(){if(!S)return;ensureVictoryState();if(S.win||S.loss){renderEndScreen();return}$('#endScreen').classList.add('hidden');$('#setup').classList.add('hidden');$('#game').classList.remove('hidden');
  $('#turnLabel').textContent=`Turn ${S.turn} · ${P().name}`;$('#bottomName').textContent=S.bottom.name;$('#bottomFlavor').textContent=S.bottom.flavor;
  $('#bottomArt').innerHTML=hasArt(S.bottom.name)?artImg(S.bottom.name,'w-full rounded-lg object-cover'):`<div class="art-placeholder">Art placeholder</div>`;
  $('#persistentTrait').textContent=`Persistent Trait — ${S.bottom.persistent.name}: ${S.bottom.persistent.effect}${persistentIgnored()?' (ignored for this Layer)':''}`;
