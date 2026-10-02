@@ -746,7 +746,7 @@ body.overlay-open{overflow:hidden}
 
 <script>
 (()=>{
-/* SPANKO BUILD: Rules 1.41 / Layered Bottom Art Fallback FIXED + Fixed Cards + Bare Fix + Follow Through Free + Refine Any Discard */
+/* SPANKO BUILD: 1.41-LAYER-ART-FIX2 */
 const root=document.getElementById('dbg12-art'); if(root.dataset.ready)return; root.dataset.ready='1';
 const $=s=>root.querySelector(s), cp=o=>{ if (typeof structuredClone==='function') return structuredClone(o); return JSON.parse(JSON.stringify(o)); };
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -1251,9 +1251,9 @@ function activeFlags(){
 }
 
 function render(){if(!S)return;ensureVictoryState();if(S.win||S.loss){renderEndScreen();return}$('#endScreen').classList.add('hidden');$('#setup').classList.add('hidden');$('#game').classList.remove('hidden');
- let activeLayerIndex=li();
+ var currentLayerIndex=li();
  $('#turnLabel').textContent=`Turn ${S.turn} · ${P().name}`;$('#bottomName').textContent=S.bottom.name;$('#bottomFlavor').textContent=S.bottom.flavor;
- let bottomLayerForArt=activeLayerIndex<0?2:activeLayerIndex;
+ let bottomLayerForArt=currentLayerIndex<0?2:currentLayerIndex;
  $('#bottomArt').innerHTML=hasArt(S.bottom.name)?bottomArtImg(S.bottom.name,bottomLayerForArt,'w-full rounded-lg object-cover'):`<div class="art-placeholder">Art placeholder</div>`;
  $('#persistentTrait').textContent=`Evergreen Trait — ${S.bottom.persistent.name}: ${S.bottom.persistent.effect}${persistentIgnored()?' (ignored for this Layer)':''}`;
  $('#layerTrait').textContent=traitText();$('#progressLabel').textContent=`Bottoms Punished ${S.punished}/4`;$('#clockLabel').textContent=`Supply remaining ${S.supplyDeck.length+S.supply.length}/20 · Broken ${S.broken.length}`;
@@ -1262,16 +1262,16 @@ function render(){if(!S)return;ensureVictoryState();if(S.win||S.loss){renderEndS
  $('#positionLabel').textContent=`Position: ${S.position||'Unpositioned'}`;$('#utilityCount').textContent=`${S.utility} remaining`;$('#disciplineCount').textContent=`${S.discipline} remaining`;$('#utilityStatus').textContent=S.utility?'Available':'Spent';
  $('#hudTurn').textContent=`T${S.turn} · ${P().name.replace('Player ','P')}`;
  $('#hudBottom').textContent=S.bottom.name;
- let displayLayerIndex=activeLayerIndex<0?2:activeLayerIndex;
- let displayLayerName=activeLayerIndex<0?'Bare':['Clothing','Underwear','Bare'][displayLayerIndex];
+ let displayLayerIndex=currentLayerIndex<0?2:currentLayerIndex;
+ let displayLayerName=currentLayerIndex<0?'Bare':['Clothing','Underwear','Bare'][displayLayerIndex];
  $('#hudLayer').textContent=`${displayLayerName} ${S.layers[displayLayerIndex].current}/${S.layers[displayLayerIndex].start}`;
  $('#hudPosition').textContent=S.position||'Unpositioned';
  $('#hudUtility').textContent=`U ${S.utility}`;
  $('#hudDiscipline').textContent=`D ${S.discipline}`;
  $('#hudSupply').textContent=S.taken?'Supply ✓':'Supply required';
  $('#hudSupply').className=`hudSupply ${S.taken?'done':'required'}`;
- $('#layers').innerHTML=['Clothing','Underwear','Bare'].map((x,i)=>`<div class="rounded-lg ${i===activeLayerIndex?'border-2 border-[var(--viz-accent)]':'border border-[var(--viz-border)]'} bg-[var(--viz-panel)] p-3"><div class="text-xs font-semibold text-[var(--viz-muted)]">${x}${i===activeLayerIndex?' · CURRENT':''}${activeLayerIndex<0&&i===2?' · PUNISHED':''}</div><div class="mt-1 text-xl font-semibold">${S.layers[i].current} / ${S.layers[i].start}</div></div>`).join('');
- $('#focusBtn').disabled=!S.utility;$('#refineBtn').disabled=!S.utility||!P().discard.some(c=>c.basic);$('#repairBtn').disabled=!S.utility||!S.broken.length;
+ $('#layers').innerHTML=['Clothing','Underwear','Bare'].map((x,i)=>`<div class="rounded-lg ${i===currentLayerIndex?'border-2 border-[var(--viz-accent)]':'border border-[var(--viz-border)]'} bg-[var(--viz-panel)] p-3"><div class="text-xs font-semibold text-[var(--viz-muted)]">${x}${i===currentLayerIndex?' · CURRENT':''}${currentLayerIndex<0&&i===2?' · PUNISHED':''}</div><div class="mt-1 text-xl font-semibold">${S.layers[i].current} / ${S.layers[i].start}</div></div>`).join('');
+ $('#focusBtn').disabled=!S.utility;$('#refineBtn').disabled=!S.utility||!P().discard.length;$('#repairBtn').disabled=!S.utility||!S.broken.length;
  $('#supplyStatus').textContent=S.taken?'Required card taken ✓':'1 card still required';
  $('#supply').innerHTML=S.supply.length?S.supply.map((c,i)=>`<div class="supply-choice rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3">${cardVisual(c,false)}<button type="button" data-supply="${i}" ${S.taken?'disabled':''} class="supply-take mt-3 min-h-11 w-full rounded-lg border border-[var(--viz-border)] px-3 font-semibold disabled:opacity-40">Take into hand</button></div>`).join(''):'<div class="text-sm text-[var(--viz-muted)]">No face-up cards remain.</div>';
  $('#handTitle').textContent=`${P().name} hand · ${P().hand.length} cards`;$('#deckInfo').textContent=`Deck ${P().deck.length} · discard ${P().discard.length} · removed ${S.removed.length}`;
