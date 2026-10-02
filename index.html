@@ -434,7 +434,7 @@ body.overlay-open{overflow:hidden}
       <button type="submit" class="intro-primary">Start randomized game</button>
       <button id="introRulesBtn" type="button" class="intro-secondary">How to Play</button>
     </form>
-    <div class="intro-version">Rules 1.2 · Card Set 1.31</div>
+    <div class="intro-version">Rules 1.4 playtest</div>
   </div>
 
   <div id="game" class="hidden space-y-4">
@@ -597,8 +597,7 @@ body.overlay-open{overflow:hidden}
         <summary>Position</summary>
         <div class="rules-body">
           <p>A Bottom may be <strong>OTK</strong>, <strong>Bent Over</strong>, or unpositioned. Position is shared by all players and remains between turns until consumed or changed.</p>
-          <p>A Position is consumed after a Discipline receives a benefit from it, unless the resolving card says otherwise. An effect that only establishes or changes Position does not consume it.</p>
-          <p><strong>Swat</strong> and <strong>Smack</strong> each gain +1 Impact while the Bottom is OTK or Bent Over, but they explicitly do <strong>not</strong> consume Position.</p>
+          <p>A Position is consumed after a Discipline receives a benefit from it, unless the resolving card says otherwise. An effect that only establishes or changes Position does not consume it.</p><p><strong>Swat</strong> and <strong>Smack</strong> each gain +1 Impact while the Bottom is OTK or Bent Over, but they do <strong>not</strong> consume Position.</p>
         </div>
       </details>
 
@@ -631,19 +630,20 @@ body.overlay-open{overflow:hidden}
 
 <script>
 (()=>{
+/* SPANKO BUILD: Rules 1.4 / Card Set 1.4 / GitHub WebP Art */
 const root=document.getElementById('dbg12-art'); if(root.dataset.ready)return; root.dataset.ready='1';
 const $=s=>root.querySelector(s), cp=o=>{ if (typeof structuredClone==='function') return structuredClone(o); return JSON.parse(JSON.stringify(o)); };
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const ART_KEYS={"Hairbrush":"I Art - Hairbrush","Wooden Spoon":"I Art - Wooden Spoon","Bathbrush":"I Art - Bathbrush","OTK Paddle":"I Art - OTK Paddle","School Paddle":"I Art - School Paddle","Belt":"I Art - Belt","Strap":"I Art - Strap","Cane":"I Art - Cane","Yardstick":"I Art - Yardstick","Slipper":"I Art - Slipper","Switch":"I Art - Switch","Librarian":"B Art - Librarian","Flight Attendant":"B Art - Flight Attendant","Secretary":"B Art - Secretary","Hotel Concierge":"B Art - Hotel Concierge","News Anchor":"B Art - News Anchor","Real Estate Agent":"B Art - Real Estate Agent","Researcher":"B Art - Researcher","Heiress":"B Art - Heiress","Substitute Teacher":"B Art - Substitute Teacher","Camp Counselor":"B Art - Camp Counselor","Bedroom":"L Art - Bedroom","Kitchen":"L Art - Kitchen","Woodshed":"L Art - Woodshed","Classroom":"L Art - Classroom","Hotel Room":"L Art - Hotel Room","Office":"L Art - Office","Beach House":"L Art - Beach House"};
 const hasArt=n=>!!ART_KEYS[n];
 const artUrl=n=>hasArt(n)?encodeURI('./'+ART_KEYS[n]+'.webp'):'';
-const artImg=(n,cls='w-full rounded-lg object-cover')=>hasArt(n)?`<img src="${artUrl(n)}" alt="${esc(n)} artwork" class="${cls}" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex'"><div class="art-placeholder" style="display:none">Art not uploaded yet</div>`:'';
+const artImg=(n,cls='w-full rounded-lg object-cover')=>hasArt(n)?`<img src="${artUrl(n)}" alt="${esc(n)} artwork" class="${cls}" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex'"><div class="art-placeholder" style="display:none">Art placeholder</div>`:'';
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
 const BASIC=[{"name":"Swat","qty":2,"basic":true,"effect":"Deal 1 Impact. +1 Impact when in OTK or Bent Over. This does not consume Position.","flavor":"Just firm enough to make her reconsider her choices"},{"name":"Smack","qty":2,"basic":true,"effect":"Deal 2 Impact. +1 Impact when in OTK or Bent Over. This does not consume Position.","flavor":"A crisp correction with considerable authority behind it"},{"name":"Turn Around","qty":2,"basic":true,"effect":"Put the Bottom OTK or Bent Over. This does not consume Position.","flavor":"A simple instruction that changes everything."},{"name":"Find the Rhythm","qty":2,"basic":true,"effect":"Deal 1 Impact, then draw 1 card.","flavor":"Once you settle into the pace, things start falling into place."}];
 const STARTING=[]; BASIC.forEach(c=>{for(let i=0;i<c.qty;i++)STARTING.push({...c})});
 
-const IMPLEMENTS=[{"name":"Hairbrush","implement":true,"supplyCard":true,"reach":"Short","impact":2,"favored":"OTK","positionBonus":2,"type":"Domestic","flavor":"It was supposed to be for getting ready. Plans changed.","effect":"2 Impact · +2 Position Bonus (OTK) · Short · Domestic"},{"name":"Wooden Spoon","implement":true,"supplyCard":true,"reach":"Short","impact":2,"favored":"OTK","positionBonus":1,"type":"Domestic","flavor":"Straight from the kitchen drawer—and suddenly much more persuasive.","effect":"2 Impact · +1 Position Bonus (OTK) · Short · Domestic"},{"name":"Bathbrush","implement":true,"supplyCard":true,"reach":"Short","impact":4,"favored":"OTK","positionBonus":2,"type":"Domestic","flavor":"Long handle, solid weight, and definitely not being used for its intended purpose.","effect":"4 Impact · +2 Position Bonus (OTK) · Short · Domestic"},{"name":"OTK Paddle","implement":true,"supplyCard":true,"reach":"Short","impact":3,"favored":"OTK","positionBonus":2,"type":"Domestic","flavor":"Compact, convenient, and designed for exactly where she’s been put.","effect":"3 Impact · +2 Position Bonus (OTK) · Short · Domestic"},{"name":"School Paddle","implement":true,"supplyCard":true,"reach":"Long","impact":3,"favored":"Bent Over","positionBonus":3,"type":"School","flavor":"A classic lesson in why some traditions refuse to disappear.","effect":"3 Impact · +3 Position Bonus (Bent Over) · Long · School"},{"name":"Belt","implement":true,"supplyCard":true,"reach":"Long","impact":2,"favored":"Bent Over","positionBonus":2,"type":"Domestic","flavor":"A quick tug through the loops makes the message perfectly clear.","effect":"2 Impact · +2 Position Bonus (Bent Over) · Long · Domestic"},{"name":"Strap","implement":true,"supplyCard":true,"reach":"Long","impact":3,"favored":"Bent Over","positionBonus":2,"type":"School","flavor":"Flexible enough to sting, sturdy enough to make an impression.","effect":"3 Impact · +2 Position Bonus (Bent Over) · Long · School"},{"name":"Cane","implement":true,"supplyCard":true,"reach":"Long","impact":2,"favored":"Bent Over","positionBonus":5,"type":"School","flavor":"There’s very little room for argument once this comes off the rack.","effect":"2 Impact · +5 Position Bonus (Bent Over) · Long · School"},{"name":"Yardstick","implement":true,"supplyCard":true,"reach":"Long","impact":2,"favored":"Bent Over","positionBonus":1,"type":"School","flavor":"For measuring just how badly she misjudged the situation.","effect":"2 Impact · +1 Position Bonus (Bent Over) · Long · School"},{"name":"Slipper","implement":true,"supplyCard":true,"reach":"Flexible","impact":2,"favored":"Either","positionBonus":2,"type":"School","flavor":"Almost comically ordinary—right up until it isn’t.","effect":"2 Impact · +2 Position Bonus (Either) · Flexible · School"},{"name":"Switch","implement":true,"supplyCard":true,"reach":"Long","impact":4,"favored":"Bent Over","positionBonus":1,"type":"Domestic","flavor":"Simple, old-fashioned, and considerably more memorable than it looks.","effect":"4 Impact · +1 Position Bonus (Bent Over) · Long · Domestic"}];
+const IMPLEMENTS=[{"name":"Hairbrush","implement":true,"supplyCard":true,"reach":"Short","impact":2,"favored":"OTK","positionBonus":2,"type":"Domestic","effect":"2 Impact · +2 Position Bonus (OTK) · Short · Domestic","flavor":"It was supposed to be for getting ready. Plans changed."},{"name":"Wooden Spoon","implement":true,"supplyCard":true,"reach":"Short","impact":2,"favored":"OTK","positionBonus":1,"type":"Domestic","effect":"2 Impact · +1 Position Bonus (OTK) · Short · Domestic","flavor":"Straight from the kitchen drawer—and suddenly much more persuasive."},{"name":"Bathbrush","implement":true,"supplyCard":true,"reach":"Short","impact":4,"favored":"OTK","positionBonus":2,"type":"Domestic","effect":"4 Impact · +2 Position Bonus (OTK) · Short · Domestic","flavor":"Long handle, solid weight, and definitely not being used for its intended purpose."},{"name":"OTK Paddle","implement":true,"supplyCard":true,"reach":"Short","impact":3,"favored":"OTK","positionBonus":2,"type":"Domestic","effect":"3 Impact · +2 Position Bonus (OTK) · Short · Domestic","flavor":"Compact, convenient, and designed for exactly where she’s been put."},{"name":"School Paddle","implement":true,"supplyCard":true,"reach":"Long","impact":3,"favored":"Bent Over","positionBonus":3,"type":"School","effect":"3 Impact · +3 Position Bonus (Bent Over) · Long · School","flavor":"A classic lesson in why some traditions refuse to disappear."},{"name":"Belt","implement":true,"supplyCard":true,"reach":"Long","impact":2,"favored":"Bent Over","positionBonus":2,"type":"Domestic","effect":"2 Impact · +2 Position Bonus (Bent Over) · Long · Domestic","flavor":"A quick tug through the loops makes the message perfectly clear."},{"name":"Strap","implement":true,"supplyCard":true,"reach":"Long","impact":3,"favored":"Bent Over","positionBonus":2,"type":"School","effect":"3 Impact · +2 Position Bonus (Bent Over) · Long · School","flavor":"Flexible enough to sting, sturdy enough to make an impression."},{"name":"Cane","implement":true,"supplyCard":true,"reach":"Long","impact":2,"favored":"Bent Over","positionBonus":5,"type":"School","effect":"2 Impact · +5 Position Bonus (Bent Over) · Long · School","flavor":"There’s very little room for argument once this comes off the rack."},{"name":"Yardstick","implement":true,"supplyCard":true,"reach":"Long","impact":2,"favored":"Bent Over","positionBonus":1,"type":"School","effect":"2 Impact · +1 Position Bonus (Bent Over) · Long · School","flavor":"For measuring just how badly she misjudged the situation."},{"name":"Slipper","implement":true,"supplyCard":true,"reach":"Flexible","impact":2,"favored":"Either","positionBonus":2,"type":"School","effect":"2 Impact · +2 Position Bonus (Either) · Flexible · School","flavor":"Almost comically ordinary—right up until it isn’t."},{"name":"Switch","implement":true,"supplyCard":true,"reach":"Long","impact":4,"favored":"Bent Over","positionBonus":1,"type":"Domestic","effect":"4 Impact · +1 Position Bonus (Bent Over) · Long · Domestic","flavor":"Simple, old-fashioned, and considerably more memorable than it looks."}];
 
 const NONIMPS=[{"name":"Perfect Setup","supplyCard":true,"effect":"Choose OTK or Bent Over. Put the Bottom in that Position. If your next Implement this turn favors that Position, the Position is not consumed after that Implement resolves.","flavor":"There. Exactly where you wanted her."},{"name":"Refurbish","supplyCard":true,"effect":"Choose a Broken Implement from the shared Broken Pile. Repair it and put it into your hand.","flavor":"A little repair work and an old favorite is ready for another round."},{"name":"Built to Last","supplyCard":true,"effect":"The next Implement you play this turn does not Break after use.","flavor":"This one isn’t going to give out that easily."},{"name":"One More","supplyCard":true,"effect":"After you play an Implement, repeat its Impact once. The Implement still only Breaks once.","flavor":"The first one made the point. The second makes sure she remembers it."},{"name":"Change Your Grip","supplyCard":true,"effect":"Your next Short Implement may treat Bent Over as favored, or your next Long Implement may treat OTK as favored.","flavor":"Same Implement. Different angle. Much better result."},{"name":"Not Finished Yet","supplyCard":true,"effect":"After breaking a Layer, you may continue taking Discipline Actions this turn.","flavor":"She thought that was the stopping point. It wasn’t."},{"name":"Follow Through","supplyCard":true,"effect":"After an Implement deals its Impact plus its Position Bonus, deal 3 additional Impact. This does not use a Discipline Action.","flavor":"Good technique means not stopping halfway through the motion."},{"name":"One More Time","supplyCard":true,"effect":"Play a card from your discard pile. This does not use a Discipline Action.","flavor":"If you’re going to do it, do it properly."},{"name":"Make It Count","supplyCard":true,"effect":"The next Implement you play this turn doubles its Position Bonus.","flavor":"A little extra, just to make absolutely certain the lesson sticks."},{"name":"Lasting Impression","supplyCard":true,"effect":"After playing an Implement, put it on top of your deck unbroken instead of Breaking it.","flavor":"Nothing fancy. Sometimes the simplest approach works just fine."},{"name":"Back to Basics","supplyCard":true,"effect":"This turn, your Swats and Smacks deal double Impact.","flavor":"The lecture is almost worse than what comes after it."},{"name":"Scolding","supplyCard":true,"effect":"Ignore the Bottom’s persistent Trait for the remainder of the current Layer.","flavor":"That excuse might have worked a moment ago. Try again."},{"name":"Follow Me","supplyCard":true,"effect":"Reveal 2 Locations. Choose 1 to replace the current Location.","flavor":"The discussion is moving somewhere considerably more private."},{"name":"Go to Your Room","supplyCard":true,"effect":"Replace the current Location with Bedroom.","flavor":"Whatever comes next apparently requires a little more space."},{"name":"Outside. Now.","supplyCard":true,"effect":"Replace the current Location with Woodshed.","flavor":"Two words, one unmistakable destination."},{"name":"Over My Knee","supplyCard":true,"effect":"Put the Bottom OTK, then draw 1 card.","flavor":"The instruction is brief. The meaning is not."},{"name":"Bend Over","supplyCard":true,"effect":"Put the Bottom Bent Over. Your next Long Implement this turn gets +1 Impact.","flavor":"You know what to do"}];
 
@@ -665,7 +665,6 @@ function locByName(n){return cp(LOCATIONS.find(x=>x.name===n))}
 function randomLocation(){return cp(LOCATIONS[Math.floor(Math.random()*LOCATIONS.length)])}
 
 /* ---- Playtest analytics scaffold ---- */
-/* Card Set 1.4 loaded from Deck_Building_Game_Current_Design_1.4.xlsx. */
 /* Gameplay patch: Scolding persists across turns until its current Layer breaks. */
 /* Mobile usability pass: sticky HUD, compact actions, wide card-art windows, art placeholders. */
 const ANALYTICS_QUEUE_KEY='dbg_playtest_queue_v1';
@@ -686,8 +685,6 @@ function analyticsWrite(key,value){
 function analyticsStartGame(playerCount){
   return {
     schemaVersion:1,
-    rulesVersion:"1.4",
-    cardSetVersion:"1.4",
     gameId:analyticsId(),
     startedAt:new Date().toISOString(),
     playerCount:Number(playerCount)||1,
@@ -768,6 +765,7 @@ function startEncounter(){
  log(`Encounter begins: ${S.bottom.name} at ${S.location.name}.`);
  analyticsStartBottom()
 }
+
 function refillSupply(){let limit=S.punished>=1?3:2;while(S.supply.length<limit&&S.supplyDeck.length)S.supply.push(S.supplyDeck.shift())}
 function resetTurnFlags(){
  let scoldLayer=(S.flags&&Number.isInteger(S.flags.scoldLayer))?S.flags.scoldLayer:null;
@@ -897,6 +895,7 @@ function layerEffects(ctx){
  if(t.name==='Smarting'&&ctx.implement&&ctx.type==='School')d++;
  return {delta:d,positionBenefit:b};
 }
+
 function locationDelta(ctx){if(!ctx.implement)return 0;let d=0;if(S.location.name==='Bedroom'&&ctx.type==='Domestic')d++;if(S.location.name==='Kitchen'&&ctx.reach==='Short')d++;if(S.location.name==='Woodshed'&&ctx.reach==='Long')d++;if(S.location.name==='Classroom'&&ctx.type==='School')d++;if(S.location.name==='Hotel Room')d--;return d}
 
 function computeImplement(c){
@@ -922,12 +921,12 @@ function computeBasic(c){
  if(c.name==='Smack')base=S.flags.backBasics?4:2;
  if(c.name==='Find the Rhythm')base=1;
  if(!base)return {damage:0,positionBenefit:false,noConsumePosition:false};
- let ownPositionBonus=((c.name==='Swat'||c.name==='Smack')&&!!S.position)?1:0;
+ let positionedBonus=((c.name==='Swat'||c.name==='Smack')&&!!S.position)?1:0;
  let ctx={implement:false,dealsImpact:true};
- let le=layerEffects(ctx),pe=persistentEffects(ctx,0,Math.max(0,le.delta)+ownPositionBonus);
+ let le=layerEffects(ctx),pe=persistentEffects(ctx,0,Math.max(0,le.delta)+positionedBonus);
  return {
-   damage:Math.max(0,base+ownPositionBonus+le.delta+pe.delta),
-   positionBenefit:le.positionBenefit||pe.positionBenefit||ownPositionBonus>0,
+   damage:Math.max(0,base+positionedBonus+le.delta+pe.delta),
+   positionBenefit:le.positionBenefit||pe.positionBenefit||positionedBonus>0,
    noConsumePosition:(c.name==='Swat'||c.name==='Smack')
  };
 }
@@ -1011,7 +1010,7 @@ function playResolved(c,free=false){
    else if(S.flags.built){P().discard.push(c);S.flags.built=false;log(`${c.name} does not Break and goes to discard.`)}
    else{S.broken.push(c);log(`${c.name} Breaks.`)}
    consumePosition(r.positionBenefit,protect);
-   S.flags.perfectPosition=null;S.flags.grip=null;S.flags.settle=false;S.flags.makeItCount=false;if(c.reach==='Long')S.flags.bendLong=false;
+   S.flags.perfectPosition=null;S.flags.grip=null;S.flags.makeItCount=false;if(c.reach==='Long')S.flags.bendLong=false;
  } else {
    let r=computeBasic(c);if(r.damage>0){didImpact=true;applyImpact(r.damage,c.name)}
    if(c.name==='Find the Rhythm')drawOne(P());
