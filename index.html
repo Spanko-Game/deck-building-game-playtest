@@ -746,7 +746,7 @@ body.overlay-open{overflow:hidden}
 
 <script>
 (()=>{
-/* SPANKO BUILD: Rules 1.41 / Layered Bottom Art Fallback + Fixed Cards + Bare Fix + Follow Through Free + Refine Any Discard */
+/* SPANKO BUILD: Rules 1.41 / Layered Bottom Art Fallback FIXED + Fixed Cards + Bare Fix + Follow Through Free + Refine Any Discard */
 const root=document.getElementById('dbg12-art'); if(root.dataset.ready)return; root.dataset.ready='1';
 const $=s=>root.querySelector(s), cp=o=>{ if (typeof structuredClone==='function') return structuredClone(o); return JSON.parse(JSON.stringify(o)); };
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -1251,6 +1251,7 @@ function activeFlags(){
 }
 
 function render(){if(!S)return;ensureVictoryState();if(S.win||S.loss){renderEndScreen();return}$('#endScreen').classList.add('hidden');$('#setup').classList.add('hidden');$('#game').classList.remove('hidden');
+ let activeLayerIndex=li();
  $('#turnLabel').textContent=`Turn ${S.turn} · ${P().name}`;$('#bottomName').textContent=S.bottom.name;$('#bottomFlavor').textContent=S.bottom.flavor;
  let bottomLayerForArt=activeLayerIndex<0?2:activeLayerIndex;
  $('#bottomArt').innerHTML=hasArt(S.bottom.name)?bottomArtImg(S.bottom.name,bottomLayerForArt,'w-full rounded-lg object-cover'):`<div class="art-placeholder">Art placeholder</div>`;
@@ -1261,7 +1262,6 @@ function render(){if(!S)return;ensureVictoryState();if(S.win||S.loss){renderEndS
  $('#positionLabel').textContent=`Position: ${S.position||'Unpositioned'}`;$('#utilityCount').textContent=`${S.utility} remaining`;$('#disciplineCount').textContent=`${S.discipline} remaining`;$('#utilityStatus').textContent=S.utility?'Available':'Spent';
  $('#hudTurn').textContent=`T${S.turn} · ${P().name.replace('Player ','P')}`;
  $('#hudBottom').textContent=S.bottom.name;
- let activeLayerIndex=li();
  let displayLayerIndex=activeLayerIndex<0?2:activeLayerIndex;
  let displayLayerName=activeLayerIndex<0?'Bare':['Clothing','Underwear','Bare'][displayLayerIndex];
  $('#hudLayer').textContent=`${displayLayerName} ${S.layers[displayLayerIndex].current}/${S.layers[displayLayerIndex].start}`;
