@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f3d48"><title>Spanko — Cooperative Deck-Building Game · Rules 1.4</title><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f3d48"><title>Spanko — Cooperative Deck-Building Game · Rules 1.41</title><style>
 :root{
   --viz-text:#2c211c;--viz-muted:#78665c;--viz-card:#fffaf2;--viz-panel:#f7efe4;
   --viz-border:#ddcdbd;--viz-accent:#8f3d48;--viz-accent-bg:#8f3d48;
@@ -411,6 +411,121 @@ body.overlay-open{overflow:hidden}
   .end-screen{margin:4px auto 0}
 }
 
+
+@media(max-width:639px){
+  :root{--spanko-card-h:300px}
+
+  /* One outer size for every playable card in the Hand. */
+  #hand .play-card-button{
+    height:var(--spanko-card-h)!important;
+    min-height:var(--spanko-card-h)!important;
+    max-height:var(--spanko-card-h)!important;
+    overflow:hidden!important;
+  }
+
+  #hand .play-card,
+  #supply .play-card{
+    height:var(--spanko-card-h)!important;
+    min-height:var(--spanko-card-h)!important;
+    max-height:var(--spanko-card-h)!important;
+    overflow:hidden!important;
+    position:relative;
+  }
+
+  #hand .play-card-copy,
+  #supply .play-card-copy{
+    min-height:0!important;
+  }
+
+  /* Implement cards keep a true 3:2 landscape art window. */
+  #hand .implement-card .play-card-art,
+  #supply .implement-card .play-card-art{
+    flex:0 0 auto;
+    width:100%;
+    aspect-ratio:3/2;
+    margin-bottom:.48rem;
+  }
+
+  #hand .implement-card .play-card-copy,
+  #supply .implement-card .play-card-copy{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+  }
+
+  #hand .implement-card .play-card-title,
+  #supply .implement-card .play-card-title{font-size:.94rem!important}
+
+  #hand .implement-card .play-card-meta,
+  #supply .implement-card .play-card-meta{font-size:.59rem!important}
+
+  #hand .implement-card .play-card-effect,
+  #supply .implement-card .play-card-effect{
+    font-size:.76rem!important;
+    line-height:1.2!important;
+    margin-top:.35rem!important;
+  }
+
+  #hand .implement-card .play-card-flavor,
+  #supply .implement-card .play-card-flavor{
+    margin-top:auto!important;
+    padding-top:.35rem!important;
+    font-size:.63rem!important;
+    line-height:1.18!important;
+  }
+
+  /* Text-only Discipline cards are intentionally designed as text cards,
+     not cards with "missing" art. */
+  #hand .text-card,
+  #supply .text-card{
+    height:var(--spanko-card-h)!important;
+    min-height:var(--spanko-card-h)!important;
+    max-height:var(--spanko-card-h)!important;
+    background:
+      radial-gradient(circle at 50% 46%, rgba(153,62,73,.055), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,0));
+  }
+
+  #hand .text-card .play-card-copy,
+  #supply .text-card .play-card-copy{
+    height:100%!important;
+    display:flex!important;
+    flex-direction:column!important;
+  }
+
+  #hand .text-card .play-card-title,
+  #supply .text-card .play-card-title{
+    font-size:1rem!important;
+    line-height:1.08!important;
+  }
+
+  #hand .text-card .play-card-meta,
+  #supply .text-card .play-card-meta{
+    font-size:.61rem!important;
+    letter-spacing:.035em!important;
+  }
+
+  #hand .text-card .play-card-effect,
+  #supply .text-card .play-card-effect{
+    margin:auto 0!important;
+    padding:.75rem 0!important;
+    border-top:1px solid rgba(121,94,78,.17);
+    border-bottom:1px solid rgba(121,94,78,.17);
+    font-size:.92rem!important;
+    line-height:1.24!important;
+    font-weight:700!important;
+  }
+
+  #hand .text-card .play-card-flavor,
+  #supply .text-card .play-card-flavor{
+    margin-top:auto!important;
+    padding-top:.5rem!important;
+    font-size:.67rem!important;
+    line-height:1.2!important;
+  }
+}
+
 </style></head><body>
 <div id="dbg12-art" class="w-full space-y-4 text-[var(--viz-text)]">
   <div id="setup" class="intro-screen">
@@ -434,7 +549,7 @@ body.overlay-open{overflow:hidden}
       <button type="submit" class="intro-primary">Start randomized game</button>
       <button id="introRulesBtn" type="button" class="intro-secondary">How to Play</button>
     </form>
-    <div class="intro-version">Rules 1.4 playtest</div>
+    <div class="intro-version">Rules 1.41 playtest</div>
   </div>
 
   <div id="game" class="hidden space-y-4">
@@ -500,7 +615,7 @@ body.overlay-open{overflow:hidden}
       </div>
       <div class="mt-4 grid gap-2 sm:grid-cols-3">
         <button id="focusBtn" type="button" class="min-h-24 rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3 text-left disabled:opacity-40"><div class="font-semibold">Focus</div><div class="mt-1 text-sm">Draw 1 card, then discard 1 card.</div></button>
-        <button id="refineBtn" type="button" class="min-h-24 rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3 text-left disabled:opacity-40"><div class="font-semibold">Refine</div><div class="mt-1 text-sm">Permanently remove 1 Basic card from your discard pile.</div></button>
+        <button id="refineBtn" type="button" class="min-h-24 rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3 text-left disabled:opacity-40"><div class="font-semibold">Refine</div><div class="mt-1 text-sm">Permanently remove 1 card from your discard pile.</div></button>
         <button id="repairBtn" type="button" class="min-h-24 rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3 text-left disabled:opacity-40"><div class="font-semibold">Repair</div><div class="mt-1 text-sm">Repair 1 Broken Implement into your discard pile.</div></button>
       </div>
     </section>
@@ -579,8 +694,9 @@ body.overlay-open{overflow:hidden}
         <div class="rules-body">
           <p>You may use up to one built-in Utility Action each turn. These are not cards.</p>
           <p><strong>Focus:</strong> Draw 1 card, then discard 1 card.</p>
-          <p><strong>Refine:</strong> Permanently remove 1 Basic card from your discard pile.</p>
+          <p><strong>Refine:</strong> Permanently remove 1 card from your discard pile.</p>
           <p><strong>Repair:</strong> Repair 1 Broken Implement and put it into your discard pile.</p>
+          <p><strong>Action-cost exceptions:</strong> Follow Through itself does not use a Discipline Action. One More Time uses its normal Discipline Action, but the card it plays from your discard pile costs 0 additional Discipline Actions.</p>
         </div>
       </details>
 
@@ -630,7 +746,7 @@ body.overlay-open{overflow:hidden}
 
 <script>
 (()=>{
-/* SPANKO BUILD: Rules 1.4 / Card Set 1.4 / GitHub WebP Art */
+/* SPANKO BUILD: Rules 1.41 / Fixed Cards + Bare Fix + Follow Through Free + Refine Any Discard */
 const root=document.getElementById('dbg12-art'); if(root.dataset.ready)return; root.dataset.ready='1';
 const $=s=>root.querySelector(s), cp=o=>{ if (typeof structuredClone==='function') return structuredClone(o); return JSON.parse(JSON.stringify(o)); };
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -645,7 +761,7 @@ const STARTING=[]; BASIC.forEach(c=>{for(let i=0;i<c.qty;i++)STARTING.push({...c
 
 const IMPLEMENTS=[{"name":"Hairbrush","implement":true,"supplyCard":true,"reach":"Short","impact":2,"favored":"OTK","positionBonus":2,"type":"Domestic","effect":"2 Impact · +2 Position Bonus (OTK) · Short · Domestic","flavor":"It was supposed to be for getting ready. Plans changed."},{"name":"Wooden Spoon","implement":true,"supplyCard":true,"reach":"Short","impact":2,"favored":"OTK","positionBonus":1,"type":"Domestic","effect":"2 Impact · +1 Position Bonus (OTK) · Short · Domestic","flavor":"Straight from the kitchen drawer—and suddenly much more persuasive."},{"name":"Bathbrush","implement":true,"supplyCard":true,"reach":"Short","impact":4,"favored":"OTK","positionBonus":2,"type":"Domestic","effect":"4 Impact · +2 Position Bonus (OTK) · Short · Domestic","flavor":"Long handle, solid weight, and definitely not being used for its intended purpose."},{"name":"OTK Paddle","implement":true,"supplyCard":true,"reach":"Short","impact":3,"favored":"OTK","positionBonus":2,"type":"Domestic","effect":"3 Impact · +2 Position Bonus (OTK) · Short · Domestic","flavor":"Compact, convenient, and designed for exactly where she’s been put."},{"name":"School Paddle","implement":true,"supplyCard":true,"reach":"Long","impact":3,"favored":"Bent Over","positionBonus":3,"type":"School","effect":"3 Impact · +3 Position Bonus (Bent Over) · Long · School","flavor":"A classic lesson in why some traditions refuse to disappear."},{"name":"Belt","implement":true,"supplyCard":true,"reach":"Long","impact":2,"favored":"Bent Over","positionBonus":2,"type":"Domestic","effect":"2 Impact · +2 Position Bonus (Bent Over) · Long · Domestic","flavor":"A quick tug through the loops makes the message perfectly clear."},{"name":"Strap","implement":true,"supplyCard":true,"reach":"Long","impact":3,"favored":"Bent Over","positionBonus":2,"type":"School","effect":"3 Impact · +2 Position Bonus (Bent Over) · Long · School","flavor":"Flexible enough to sting, sturdy enough to make an impression."},{"name":"Cane","implement":true,"supplyCard":true,"reach":"Long","impact":2,"favored":"Bent Over","positionBonus":5,"type":"School","effect":"2 Impact · +5 Position Bonus (Bent Over) · Long · School","flavor":"There’s very little room for argument once this comes off the rack."},{"name":"Yardstick","implement":true,"supplyCard":true,"reach":"Long","impact":2,"favored":"Bent Over","positionBonus":1,"type":"School","effect":"2 Impact · +1 Position Bonus (Bent Over) · Long · School","flavor":"For measuring just how badly she misjudged the situation."},{"name":"Slipper","implement":true,"supplyCard":true,"reach":"Flexible","impact":2,"favored":"Either","positionBonus":2,"type":"School","effect":"2 Impact · +2 Position Bonus (Either) · Flexible · School","flavor":"Almost comically ordinary—right up until it isn’t."},{"name":"Switch","implement":true,"supplyCard":true,"reach":"Long","impact":4,"favored":"Bent Over","positionBonus":1,"type":"Domestic","effect":"4 Impact · +1 Position Bonus (Bent Over) · Long · Domestic","flavor":"Simple, old-fashioned, and considerably more memorable than it looks."}];
 
-const NONIMPS=[{"name":"Perfect Setup","supplyCard":true,"effect":"Choose OTK or Bent Over. Put the Bottom in that Position. If your next Implement this turn favors that Position, the Position is not consumed after that Implement resolves.","flavor":"There. Exactly where you wanted her."},{"name":"Refurbish","supplyCard":true,"effect":"Choose a Broken Implement from the shared Broken Pile. Repair it and put it into your hand.","flavor":"A little repair work and an old favorite is ready for another round."},{"name":"Built to Last","supplyCard":true,"effect":"The next Implement you play this turn does not Break after use.","flavor":"This one isn’t going to give out that easily."},{"name":"One More","supplyCard":true,"effect":"After you play an Implement, repeat its Impact once. The Implement still only Breaks once.","flavor":"The first one made the point. The second makes sure she remembers it."},{"name":"Change Your Grip","supplyCard":true,"effect":"Your next Short Implement may treat Bent Over as favored, or your next Long Implement may treat OTK as favored.","flavor":"Same Implement. Different angle. Much better result."},{"name":"Not Finished Yet","supplyCard":true,"effect":"After breaking a Layer, you may continue taking Discipline Actions this turn.","flavor":"She thought that was the stopping point. It wasn’t."},{"name":"Follow Through","supplyCard":true,"effect":"After an Implement deals its Impact plus its Position Bonus, deal 3 additional Impact. This does not use a Discipline Action.","flavor":"Good technique means not stopping halfway through the motion."},{"name":"One More Time","supplyCard":true,"effect":"Play a card from your discard pile. This does not use a Discipline Action.","flavor":"If you’re going to do it, do it properly."},{"name":"Make It Count","supplyCard":true,"effect":"The next Implement you play this turn doubles its Position Bonus.","flavor":"A little extra, just to make absolutely certain the lesson sticks."},{"name":"Lasting Impression","supplyCard":true,"effect":"After playing an Implement, put it on top of your deck unbroken instead of Breaking it.","flavor":"Nothing fancy. Sometimes the simplest approach works just fine."},{"name":"Back to Basics","supplyCard":true,"effect":"This turn, your Swats and Smacks deal double Impact.","flavor":"The lecture is almost worse than what comes after it."},{"name":"Scolding","supplyCard":true,"effect":"Ignore the Bottom’s persistent Trait for the remainder of the current Layer.","flavor":"That excuse might have worked a moment ago. Try again."},{"name":"Follow Me","supplyCard":true,"effect":"Reveal 2 Locations. Choose 1 to replace the current Location.","flavor":"The discussion is moving somewhere considerably more private."},{"name":"Go to Your Room","supplyCard":true,"effect":"Replace the current Location with Bedroom.","flavor":"Whatever comes next apparently requires a little more space."},{"name":"Outside. Now.","supplyCard":true,"effect":"Replace the current Location with Woodshed.","flavor":"Two words, one unmistakable destination."},{"name":"Over My Knee","supplyCard":true,"effect":"Put the Bottom OTK, then draw 1 card.","flavor":"The instruction is brief. The meaning is not."},{"name":"Bend Over","supplyCard":true,"effect":"Put the Bottom Bent Over. Your next Long Implement this turn gets +1 Impact.","flavor":"You know what to do"}];
+const NONIMPS=[{"name":"Perfect Setup","supplyCard":true,"effect":"Choose OTK or Bent Over. Put the Bottom in that Position. If your next Implement this turn favors that Position, the Position is not consumed after that Implement resolves.","flavor":"There. Exactly where you wanted her."},{"name":"Refurbish","supplyCard":true,"effect":"Choose a Broken Implement from the shared Broken Pile. Repair it and put it into your hand.","flavor":"A little repair work and an old favorite is ready for another round."},{"name":"Built to Last","supplyCard":true,"effect":"The next Implement you play this turn does not Break after use.","flavor":"This one isn’t going to give out that easily."},{"name":"One More","supplyCard":true,"effect":"After you play an Implement, repeat its Impact once. The Implement still only Breaks once.","flavor":"The first one made the point. The second makes sure she remembers it."},{"name":"Change Your Grip","supplyCard":true,"effect":"Your next Short Implement may treat Bent Over as favored, or your next Long Implement may treat OTK as favored.","flavor":"Same Implement. Different angle. Much better result."},{"name":"Not Finished Yet","supplyCard":true,"effect":"After breaking a Layer, you may continue taking Discipline Actions this turn.","flavor":"She thought that was the stopping point. It wasn’t."},{"name":"Follow Through","supplyCard":true,"effect":"Playing Follow Through does not use a Discipline Action. After an Implement deals its Impact plus its Position Bonus, deal 3 additional Impact.","flavor":"Good technique means not stopping halfway through the motion."},{"name":"One More Time","supplyCard":true,"effect":"Play a card from your discard pile as part of resolving One More Time. The card played this way does not use an additional Discipline Action.","flavor":"If you’re going to do it, do it properly."},{"name":"Make It Count","supplyCard":true,"effect":"The next Implement you play this turn doubles its Position Bonus.","flavor":"A little extra, just to make absolutely certain the lesson sticks."},{"name":"Lasting Impression","supplyCard":true,"effect":"After playing an Implement, put it on top of your deck unbroken instead of Breaking it.","flavor":"Nothing fancy. Sometimes the simplest approach works just fine."},{"name":"Back to Basics","supplyCard":true,"effect":"This turn, your Swats and Smacks deal double Impact.","flavor":"The lecture is almost worse than what comes after it."},{"name":"Scolding","supplyCard":true,"effect":"Ignore the Bottom’s persistent Trait for the remainder of the current Layer.","flavor":"That excuse might have worked a moment ago. Try again."},{"name":"Follow Me","supplyCard":true,"effect":"Reveal 2 Locations. Choose 1 to replace the current Location.","flavor":"The discussion is moving somewhere considerably more private."},{"name":"Go to Your Room","supplyCard":true,"effect":"Replace the current Location with Bedroom.","flavor":"Whatever comes next apparently requires a little more space."},{"name":"Outside. Now.","supplyCard":true,"effect":"Replace the current Location with Woodshed.","flavor":"Two words, one unmistakable destination."},{"name":"Over My Knee","supplyCard":true,"effect":"Put the Bottom OTK, then draw 1 card.","flavor":"The instruction is brief. The meaning is not."},{"name":"Bend Over","supplyCard":true,"effect":"Put the Bottom Bent Over. Your next Long Implement this turn gets +1 Impact.","flavor":"You know what to do"}];
 
 const BOTTOMS=[{"name":"Librarian","persistent":{"name":"Quiet Please","effect":"Implements deal -1 Impact."},"clothing":{"name":"Demure","effect":"Clothing begins with +2 Composure."},"bare":{"name":"Smarting","effect":"School Implements deal +1 Impact."},"flavor":"She’s spent all day shushing everyone else while quietly breaking every rule herself. Apparently, overdue consequences accrue interest too."},{"name":"Flight Attendant","persistent":{"name":"Turbulence","effect":"Bent Over Disciplines deal -1 Impact."},"clothing":{"name":"Collected","effect":"Recover 1 Composure at the end of each turn."},"bare":{"name":"Vulnerable","effect":"OTK Disciplines deal +1 Impact."},"flavor":"She ignored the seatbelt sign, pocketed a few too many mini bottles, and got a little too comfortable giving orders. There may be some turbulence ahead."},{"name":"Secretary","persistent":{"name":"By Appointment Only","effect":"The first Discipline each turn deals -1 Impact."},"clothing":{"name":"Prim","effect":"Bent Over Disciplines deal -1 Impact."},"bare":{"name":"Tender","effect":"Short Implements deal +1 Impact."},"flavor":"She rescheduled three meetings, misplaced an important file, and somehow still found time for a two-hour lunch. Efficiency has finally caught up with her."},{"name":"Hotel Concierge","persistent":{"name":"Do Not Disturb","effect":"Begin the Encounter in the Hotel Room."},"clothing":{"name":"Proper","effect":"Long Implements deal -1 Impact."},"bare":{"name":"Right at Home","effect":"Domestic Implements deal +1 Impact."},"flavor":"She gave herself the best room, the best table, and the last bottle of champagne. Guest satisfaction has officially become a secondary concern."},{"name":"News Anchor","persistent":{"name":"On Air","effect":"The first Discipline each turn deals -1 Impact."},"clothing":{"name":"Demure","effect":"Clothing begins with +2 Composure."},"bare":{"name":"Off Balance","effect":"Bent Over Disciplines deal +1 Impact."},"flavor":"She promised sunshine, sent everyone out without an umbrella, and then called the downpour “unexpected.” Tonight’s forecast includes a very high chance of consequences."},{"name":"Real Estate Agent","persistent":{"name":"Open House","effect":"Change to a random Location at the start of each turn."},"clothing":{"name":"Used to It","effect":"Domestic Implements deal -1 Impact."},"bare":{"name":"Sensitive","effect":"Long Implements deal +1 Impact."},"flavor":"She scheduled three showings at once, “forgot” who had the keys, and somehow still expects the commission. Closing day may be a little uncomfortable."},{"name":"Researcher","persistent":{"name":"Overthinking","effect":"Disciplines while unpositioned deal -1 Impact."},"clothing":{"name":"Demure","effect":"Clothing begins with +2 Composure."},"bare":{"name":"Vulnerable","effect":"OTK Disciplines deal +1 Impact."},"flavor":"Her latest breakthrough: the cure for procrastination is consequences."},{"name":"Heiress","persistent":{"name":"Spoiled","effect":"The first Discipline each turn gets no bonus Impact from Position."},"clothing":{"name":"Squirmy","effect":"OTK Disciplines deal -1 Impact."},"bare":{"name":"Already Sorry","effect":"Bare begins with -2 Composure."},"flavor":"She borrowed the car, maxed out the card, and still somehow expected someone else to apologize. It seems the consequences are finally about to catch up with her."},{"name":"Substitute Teacher","persistent":{"name":"Classroom Control","effect":"School Implements deal -1 Impact."},"clothing":{"name":"Prim","effect":"Bent Over Disciplines deal -1 Impact."},"bare":{"name":"Already Sorry","effect":"Bare begins with -2 Composure."},"flavor":"She declared movie day before taking attendance and dismissed the class ten minutes early. Unfortunately, someone from administration was paying attention."},{"name":"Camp Counselor","persistent":{"name":"Outdoorsy","effect":"Short Implements deal -1 Impact."},"clothing":{"name":"Old School","effect":"School Implements deal -1 Impact."},"bare":{"name":"Off Balance","effect":"Bent Over Disciplines deal +1 Impact."},"flavor":"She stole the marshmallows, started a cabin prank war, and blamed the raccoons. Camp rules apply to counselors too."}];
 
@@ -850,7 +966,16 @@ function newGame(n){let chosenI=shuffle(IMPLEMENTS).slice(0,8).map(cp),chosenN=s
 function openPending(type,card,title,options,extra={}){S.pending={type,card,title,options,...extra};render()}
 function spendUtility(){if(!S.utility)return false;S.utility--;return true}
 function focus(){if(!S.utility)return notice('Utility Action already used.');save();spendUtility();drawOne(P());log('Focus draws 1 card.');openPending('focus',null,'Focus',P().hand.map((c,i)=>({label:c.name,sub:c.effect,index:i,card:c})),{help:'You drew 1 card. Choose 1 card from your hand to discard.'})}
-function refine(){if(!S.utility)return notice('Utility Action already used.');let a=P().discard.map((c,i)=>({c,i})).filter(x=>x.c.basic);if(!a.length)return notice('No Basic card is in your discard pile.');save();openPending('refine',null,'Refine',a.map(x=>({label:x.c.name,sub:x.c.effect,index:x.i,card:x.c})),{help:'Choose 1 Basic card from your discard pile to permanently remove from the game.'})}
+function refine(){
+ if(!S.utility)return notice('Utility Action already used.');
+ let a=P().discard.map((c,i)=>({c,i}));
+ if(!a.length)return notice('Your discard pile is empty.');
+ save();
+ openPending('refine',null,'Refine',
+   a.map(x=>({label:x.c.name,sub:x.c.effect,index:x.i,card:x.c})),
+   {help:'Choose 1 card from your discard pile to permanently remove from the game.'}
+ )
+}
 function repair(){if(!S.utility)return notice('Utility Action already used.');if(!S.broken.length)return notice('The Broken Pile is empty.');save();openPending('repair',null,'Repair',S.broken.map((c,i)=>({label:c.name,sub:c.effect,index:i,card:c})),{help:'Choose 1 Broken Implement. It will be repaired and moved to your discard pile.'})}
 
 function resolvePending(i){let q=S.pending,o=q&&q.options[i];if(!o)return;
@@ -860,7 +985,16 @@ function resolvePending(i){let q=S.pending,o=q&&q.options[i];if(!o)return;
  else if(q.type==='position'){S.position=o.position;log(`${q.card.name} puts the Bottom ${o.position}.`);if(q.card.name==='Perfect Setup')S.flags.perfectPosition=o.position;finishNonImplement(q.card)}
  else if(q.type==='grip'){S.flags.grip=o.value;log(`Change Your Grip: ${o.label}.`);finishNonImplement(q.card)}
  else if(q.type==='refurbish'){let c=S.broken.splice(o.index,1)[0];if(c){P().hand.push(c);log(`Refurbish repairs ${c.name} directly into hand.`)}finishNonImplement(q.card)}
- else if(q.type==='oneMoreTime'){let c=P().discard.splice(o.index,1)[0];finishNonImplement(q.card);S.pending=null;playResolved(c,true);return}
+ else if(q.type==='oneMoreTime'){
+   let c=P().discard.splice(o.index,1)[0];
+   finishNonImplement(q.card);
+   S.pending=null;
+   if(c){
+     log(`One More Time automatically plays ${c.name} from the discard pile for 0 additional Discipline Actions.`);
+     playResolved(c,true);
+   }else render();
+   return
+ }
  else if(q.type==='followMe'){S.location=cp(o.location);log(`Follow Me changes the Location to ${S.location.name}.`);finishNonImplement(q.card)}
  S.pending=null;render()}
 
@@ -956,6 +1090,7 @@ function applyImpact(n,source){if(n<=0||S.ended)return {broke:false};let left=n,
      if(i===2){
        S.punished++;
        S.ended=true;
+       S.pending=null;
        analyticsBottomPunished();
        log(`${S.bottom.name} is Punished. (${Math.min(S.punished,4)}/4)`);
        if(ensureVictoryState())log('Players win!');
@@ -979,8 +1114,23 @@ function recordImpactDiscipline(didImpact){}
 
 function finishNonImplement(c){P().discard.push(c);S.flags.firstDiscipline=false}
 
-function playFromHand(i){if(S.pending||S.win||S.loss||S.ended)return;if(S.discipline<1)return notice('No Discipline Actions remain.');let c=P().hand[i];if(!c)return;save();P().hand.splice(i,1);S.discipline--;playResolved(c,false)}
+function usesDisciplineAction(c){
+ return c&&c.name!=='Follow Through';
+}
+function playFromHand(i){
+ if(S.pending||S.win||S.loss||S.ended)return;
+ let c=P().hand[i];
+ if(!c)return;
+ let costsAction=usesDisciplineAction(c);
+ if(costsAction&&S.discipline<1)return notice('No Discipline Actions remain.');
+ save();
+ P().hand.splice(i,1);
+ if(costsAction)S.discipline--;
+ else log(`${c.name} is played without using a Discipline Action.`);
+ playResolved(c,!costsAction);
+}
 function playResolved(c,free=false){
+ if(free)log(`${c.name} is being played for 0 additional Discipline Actions.`);
  if(c.name==='Turn Around'||c.name==='Perfect Setup'){openPending('position',c,`${c.name} — choose Position`,[{label:'OTK',position:'OTK'},{label:'Bent Over',position:'Bent Over'}]);return}
  if(c.name==='Change Your Grip'){openPending('grip',c,'Change Your Grip — choose the next Implement option',[{label:'Short treats Bent Over as favored',value:'shortBent'},{label:'Long treats OTK as favored',value:'longOtk'}]);return}
  if(c.name==='Refurbish'){if(!S.broken.length){log('Refurbish has no Broken Implement to repair.');finishNonImplement(c);render();return}openPending('refurbish',c,'Refurbish — choose a Broken Implement',S.broken.map((x,i)=>({label:x.name,sub:x.effect,index:i})));return}
@@ -1004,7 +1154,7 @@ function playResolved(c,free=false){
  if(c.implement){
    let r=computeImplement(c);didImpact=r.damage>0;applyImpact(r.damage,c.name);
    if(S.flags.oneMore&&!S.ended){S.flags.oneMore=false;applyImpact(r.damage,`${c.name} — One More`)}
-   if(S.flags.followThrough&&r.gotPositionBonus&&!S.ended){S.flags.followThrough=false;applyImpact(3,'Follow Through')}
+   if(S.flags.followThrough&&r.gotPositionBonus&&!S.ended){S.flags.followThrough=false;log('Follow Through adds 3 Impact without using an additional Discipline Action.');applyImpact(3,'Follow Through')}
    let protect=!!(S.flags.perfectPosition&&S.position===S.flags.perfectPosition&&r.favored);
    if(S.flags.lasting){P().deck.unshift(c);S.flags.lasting=false;log(`${c.name} goes on top of the deck unbroken.`)}
    else if(S.flags.built){P().discard.push(c);S.flags.built=false;log(`${c.name} does not Break and goes to discard.`)}
@@ -1044,7 +1194,7 @@ function cardVisual(c,button=false,index=0,zone='card'){
      ${c.flavor?`<div class="play-card-flavor">${esc(c.flavor)}</div>`:''}
    </div>
  </div>`;
- if(button)return `<button type="button" data-${zone}="${index}" ${S.discipline<1||S.pending||S.ended?'disabled':''} class="play-card-button rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3 text-left disabled:opacity-40">${body}</button>`;
+ if(button){let noAction=usesDisciplineAction(c)?S.discipline<1:false;return `<button type="button" data-${zone}="${index}" ${noAction||S.pending||S.ended?'disabled':''} class="play-card-button rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3 text-left disabled:opacity-40">${body}</button>`;}
  return body;
 }
 function pendingHtml(){if(!S.pending)return'';let q=S.pending;let img=q.card&&hasArt(q.card.name)?`<div class="mb-3 max-w-[180px]">${artImg(q.card.name)}</div>`:'';return `${img}<div class="text-xs font-semibold uppercase tracking-wide text-[var(--viz-muted)]">Resolving</div><div class="mt-1 font-semibold">${esc(q.title)}</div>${q.card?`<div class="mt-1 text-sm">${esc(q.card.effect)}</div>`:''}<div class="mt-3 grid gap-2 sm:grid-cols-2">${q.options.map((o,i)=>`<button type="button" data-choice="${i}" class="min-h-11 rounded-lg border border-[var(--viz-border)] bg-[var(--viz-card)] p-3 text-left"><div class="font-semibold">${esc(o.label)}</div>${o.sub?`<div class="mt-1 text-sm text-[var(--viz-muted)]">${esc(o.sub)}</div>`:''}</button>`).join('')}</div>`}
@@ -1096,13 +1246,16 @@ function render(){if(!S)return;ensureVictoryState();if(S.win||S.loss){renderEndS
  $('#positionLabel').textContent=`Position: ${S.position||'Unpositioned'}`;$('#utilityCount').textContent=`${S.utility} remaining`;$('#disciplineCount').textContent=`${S.discipline} remaining`;$('#utilityStatus').textContent=S.utility?'Available':'Spent';
  $('#hudTurn').textContent=`T${S.turn} · ${P().name.replace('Player ','P')}`;
  $('#hudBottom').textContent=S.bottom.name;
- $('#hudLayer').textContent=`${lname()} ${S.layers[li()].current}/${S.layers[li()].start}`;
+ let activeLayerIndex=li();
+ let displayLayerIndex=activeLayerIndex<0?2:activeLayerIndex;
+ let displayLayerName=activeLayerIndex<0?'Bare':['Clothing','Underwear','Bare'][displayLayerIndex];
+ $('#hudLayer').textContent=`${displayLayerName} ${S.layers[displayLayerIndex].current}/${S.layers[displayLayerIndex].start}`;
  $('#hudPosition').textContent=S.position||'Unpositioned';
  $('#hudUtility').textContent=`U ${S.utility}`;
  $('#hudDiscipline').textContent=`D ${S.discipline}`;
  $('#hudSupply').textContent=S.taken?'Supply ✓':'Supply required';
  $('#hudSupply').className=`hudSupply ${S.taken?'done':'required'}`;
- $('#layers').innerHTML=['Clothing','Underwear','Bare'].map((x,i)=>`<div class="rounded-lg ${i===li()?'border-2 border-[var(--viz-accent)]':'border border-[var(--viz-border)]'} bg-[var(--viz-panel)] p-3"><div class="text-xs font-semibold text-[var(--viz-muted)]">${x}${i===li()?' · CURRENT':''}</div><div class="mt-1 text-xl font-semibold">${S.layers[i].current} / ${S.layers[i].start}</div></div>`).join('');
+ $('#layers').innerHTML=['Clothing','Underwear','Bare'].map((x,i)=>`<div class="rounded-lg ${i===activeLayerIndex?'border-2 border-[var(--viz-accent)]':'border border-[var(--viz-border)]'} bg-[var(--viz-panel)] p-3"><div class="text-xs font-semibold text-[var(--viz-muted)]">${x}${i===activeLayerIndex?' · CURRENT':''}${activeLayerIndex<0&&i===2?' · PUNISHED':''}</div><div class="mt-1 text-xl font-semibold">${S.layers[i].current} / ${S.layers[i].start}</div></div>`).join('');
  $('#focusBtn').disabled=!S.utility;$('#refineBtn').disabled=!S.utility||!P().discard.some(c=>c.basic);$('#repairBtn').disabled=!S.utility||!S.broken.length;
  $('#supplyStatus').textContent=S.taken?'Required card taken ✓':'1 card still required';
  $('#supply').innerHTML=S.supply.length?S.supply.map((c,i)=>`<div class="supply-choice rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3">${cardVisual(c,false)}<button type="button" data-supply="${i}" ${S.taken?'disabled':''} class="supply-take mt-3 min-h-11 w-full rounded-lg border border-[var(--viz-border)] px-3 font-semibold disabled:opacity-40">Take into hand</button></div>`).join(''):'<div class="text-sm text-[var(--viz-muted)]">No face-up cards remain.</div>';
@@ -1194,7 +1347,7 @@ async function uploadRecord(record, user, status) {
   const cleanRecord = JSON.parse(JSON.stringify(record));
   cleanRecord.ownerUid = user.uid;
   cleanRecord.status = status;
-  cleanRecord.siteVersion = "rules-1.4-cardset-1.4";
+  cleanRecord.siteVersion = "rules-1.41-cardset-1.41";
   cleanRecord.lastSyncedAt = serverTimestamp();
 
   await setDoc(
