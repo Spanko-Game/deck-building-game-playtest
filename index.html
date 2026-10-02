@@ -746,7 +746,7 @@ body.overlay-open{overflow:hidden}
 
 <script>
 (()=>{
-/* SPANKO BUILD: Rules 1.41 / Fixed Cards + Bare Fix + Follow Through Free + Refine Any Discard */
+/* SPANKO BUILD: Rules 1.41 / Layered Bottom Art Fallback + Fixed Cards + Bare Fix + Follow Through Free + Refine Any Discard */
 const root=document.getElementById('dbg12-art'); if(root.dataset.ready)return; root.dataset.ready='1';
 const $=s=>root.querySelector(s), cp=o=>{ if (typeof structuredClone==='function') return structuredClone(o); return JSON.parse(JSON.stringify(o)); };
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -754,6 +754,20 @@ const ART_KEYS={"Hairbrush":"I Art - Hairbrush","Wooden Spoon":"I Art - Wooden S
 const hasArt=n=>!!ART_KEYS[n];
 const artUrl=n=>hasArt(n)?encodeURI('./'+ART_KEYS[n]+'.webp'):'';
 const artImg=(n,cls='w-full rounded-lg object-cover')=>hasArt(n)?`<img src="${artUrl(n)}" alt="${esc(n)} artwork" class="${cls}" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex'"><div class="art-placeholder" style="display:none">Art placeholder</div>`:'';
+const isBottomArtKey=n=>hasArt(n)&&/^B Art - /.test(ART_KEYS[n]);
+const bottomArtBaseUrl=n=>isBottomArtKey(n)?encodeURI('./'+ART_KEYS[n]+'.webp'):'';
+const bottomArtStageUrl=(n,layerIndex)=>{
+ if(!isBottomArtKey(n))return '';
+ let suffix=layerIndex===1?' U':layerIndex===2?' B':'';
+ return encodeURI('./'+ART_KEYS[n]+suffix+'.webp');
+};
+const bottomArtImg=(n,layerIndex,cls='w-full rounded-lg object-cover')=>{
+ if(!hasArt(n))return '';
+ let base=artUrl(n);
+ if(!isBottomArtKey(n)||layerIndex===0)return `<img src="${base}" alt="${esc(n)} artwork" class="${cls}" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex'"><div class="art-placeholder" style="display:none">Art placeholder</div>`;
+ let staged=bottomArtStageUrl(n,layerIndex);
+ return `<img src="${staged}" alt="${esc(n)} artwork" class="${cls}" onerror="this.onerror=null;this.src='${base}';this.onerror=function(){this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex'}"><div class="art-placeholder" style="display:none">Art placeholder</div>`;
+};
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
 const BASIC=[{"name":"Swat","qty":2,"basic":true,"effect":"Deal 1 Impact. +1 Impact when in OTK or Bent Over. This does not consume Position.","flavor":"Just firm enough to make her reconsider her choices"},{"name":"Smack","qty":2,"basic":true,"effect":"Deal 2 Impact. +1 Impact when in OTK or Bent Over. This does not consume Position.","flavor":"A crisp correction with considerable authority behind it"},{"name":"Turn Around","qty":2,"basic":true,"effect":"Put the Bottom OTK or Bent Over. This does not consume Position.","flavor":"A simple instruction that changes everything."},{"name":"Find the Rhythm","qty":2,"basic":true,"effect":"Deal 1 Impact, then draw 1 card.","flavor":"Once you settle into the pace, things start falling into place."}];
@@ -1238,7 +1252,8 @@ function activeFlags(){
 
 function render(){if(!S)return;ensureVictoryState();if(S.win||S.loss){renderEndScreen();return}$('#endScreen').classList.add('hidden');$('#setup').classList.add('hidden');$('#game').classList.remove('hidden');
  $('#turnLabel').textContent=`Turn ${S.turn} · ${P().name}`;$('#bottomName').textContent=S.bottom.name;$('#bottomFlavor').textContent=S.bottom.flavor;
- $('#bottomArt').innerHTML=hasArt(S.bottom.name)?artImg(S.bottom.name,'w-full rounded-lg object-cover'):`<div class="art-placeholder">Art placeholder</div>`;
+ let bottomLayerForArt=activeLayerIndex<0?2:activeLayerIndex;
+ $('#bottomArt').innerHTML=hasArt(S.bottom.name)?bottomArtImg(S.bottom.name,bottomLayerForArt,'w-full rounded-lg object-cover'):`<div class="art-placeholder">Art placeholder</div>`;
  $('#persistentTrait').textContent=`Evergreen Trait — ${S.bottom.persistent.name}: ${S.bottom.persistent.effect}${persistentIgnored()?' (ignored for this Layer)':''}`;
  $('#layerTrait').textContent=traitText();$('#progressLabel').textContent=`Bottoms Punished ${S.punished}/4`;$('#clockLabel').textContent=`Supply remaining ${S.supplyDeck.length+S.supply.length}/20 · Broken ${S.broken.length}`;
  $('#locationName').textContent=S.location.name;$('#locationFlavor').textContent=S.location.flavor;$('#locationEffect').textContent=S.location.effect;
