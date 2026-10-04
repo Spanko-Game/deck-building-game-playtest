@@ -527,9 +527,6 @@ body.overlay-open{overflow:hidden}
 }
 
 
-.full-rules-details{margin-top:.9rem!important;border:1px solid var(--viz-border)!important;border-radius:.85rem;padding:.75rem!important;background:var(--viz-panel)}
-.full-rules-details summary{font-size:1rem!important;color:var(--viz-text)}
-.full-rules-pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:.8rem 0 0;font:inherit;font-size:.78rem;line-height:1.48;color:var(--viz-muted)}
 
 
 /* Desktop encounter presentation */
@@ -599,6 +596,82 @@ body.overlay-open{overflow:hidden}
   50%{box-shadow:0 0 0 6px rgba(143,61,72,.13),var(--shadow)}
 }
 
+
+.player-rulebook-sheet{max-width:980px!important}
+.rulebook-subtitle{margin-top:.18rem;color:var(--viz-muted);font-size:.82rem;font-weight:650}
+.rulebook-pages{display:grid;grid-template-columns:1fr;gap:1rem;padding:.2rem 0 .3rem}
+.rulebook-page{
+  background:#fffdf8;
+  border:1px solid var(--viz-border);
+  border-radius:.85rem;
+  padding:1rem 1.05rem;
+  color:var(--viz-text);
+  box-shadow:0 4px 14px rgba(62,38,28,.06)
+}
+.rulebook-page h3{margin:1rem 0 .38rem;font-size:1rem;line-height:1.2}
+.rulebook-page h3:first-child{margin-top:0}
+.rulebook-page h4{margin:.78rem 0 .3rem;font-size:.9rem}
+.rulebook-page p,.rulebook-page li{font-size:.82rem;line-height:1.46}
+.rulebook-page p{margin:.32rem 0}
+.rulebook-page ul,.rulebook-page ol{margin:.3rem 0 .55rem;padding-left:1.2rem}
+.rulebook-page li{margin:.2rem 0}
+.rulebook-table{width:100%;border-collapse:collapse;margin:.38rem 0 .58rem;font-size:.78rem}
+.rulebook-table th,.rulebook-table td{border:1px solid var(--viz-border);padding:.38rem .45rem;text-align:left;vertical-align:top}
+.rulebook-table th{background:var(--viz-panel);font-weight:800}
+.rulebook-footer-note{margin-top:.8rem!important;padding-top:.65rem;border-top:1px solid var(--viz-border)}
+@media(min-width:840px){
+  .rulebook-pages{grid-template-columns:1fr 1fr;align-items:start}
+  .player-rulebook-sheet{max-height:90vh!important}
+}
+
+
+/* Reworked bottom encounter area: give the Bottom art much more presence on desktop. */
+.encounter-body{display:block}
+.encounter-art{margin:0 0 10px}
+.encounter-art .art-placeholder,
+.encounter-art img{display:block;width:100%;border-radius:.75rem}
+
+@media(min-width:640px){
+  #game>section:first-of-type{align-items:start}
+  .encounter-body{
+    display:grid;
+    grid-template-columns:minmax(320px,360px) minmax(0,1fr);
+    gap:1.15rem;
+    align-items:stretch;
+  }
+  .encounter-art{
+    margin:0;
+    display:flex;
+    align-self:stretch;
+    min-width:0;
+  }
+  .encounter-art .art-placeholder,
+  .encounter-art img{
+    width:100%!important;
+    height:100%!important;
+    min-height:360px;
+    aspect-ratio:4/5!important;
+    object-fit:cover!important;
+    object-position:center top!important;
+  }
+  .encounter-copy{
+    display:flex;
+    flex-direction:column;
+    min-height:100%;
+  }
+  .encounter-copy #layers{margin-top:1.15rem!important}
+}
+@media(min-width:1200px){
+  .encounter-body{grid-template-columns:minmax(360px,420px) minmax(0,1fr)}
+  .encounter-art .art-placeholder,
+  .encounter-art img{min-height:400px}
+}
+@media(max-width:639px){
+  .encounter-art{margin:0 0 10px}
+  .encounter-art .art-placeholder,
+  .encounter-art img{height:auto!important;min-height:0;aspect-ratio:3/2!important;object-fit:cover!important;object-position:center!important}
+}
+
 </style></head><body>
 <div id="dbg12-art" class="w-full space-y-4 text-[var(--viz-text)]">
   <div id="setup" class="intro-screen">
@@ -657,9 +730,9 @@ body.overlay-open{overflow:hidden}
     </div>
     <section class="grid gap-3 md:grid-cols-3">
       <div class="rounded-xl border border-[var(--viz-border)] bg-[var(--viz-card)] p-4 md:col-span-2">
-        <div class="grid gap-4 sm:grid-cols-[140px_1fr]">
-          <div id="bottomArt"></div>
-          <div class="min-w-0">
+        <div class="encounter-body">
+          <div id="bottomArt" class="encounter-art"></div>
+          <div class="encounter-copy min-w-0">
             <div class="flex flex-wrap justify-between gap-3">
               <div class="min-w-0">
                 <div id="turnLabel" class="text-sm font-semibold text-[var(--viz-muted)]"></div>
@@ -673,10 +746,10 @@ body.overlay-open{overflow:hidden}
             <div id="bottomFlavor" class="mt-2 text-sm italic text-[var(--viz-muted)]"></div>
             <div id="persistentTrait" class="mt-3 text-sm"></div>
             <div id="layerTrait" class="mt-1 text-sm font-medium"></div>
+            <div id="layers" class="mt-4 grid grid-cols-3 gap-2"></div>
+            <div id="positionLabel" class="mt-3 text-sm font-semibold"></div>
           </div>
         </div>
-        <div id="layers" class="mt-4 grid grid-cols-3 gap-2"></div>
-        <div id="positionLabel" class="mt-3 text-sm font-semibold"></div>
       </div>
 
       <div class="rounded-xl border border-[var(--viz-border)] bg-[var(--viz-card)] p-4">
@@ -751,688 +824,119 @@ body.overlay-open{overflow:hidden}
     </div>
   </div>
 
+  
   <div id="rulesModal" class="rules-modal hidden" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
     <div class="rules-backdrop" data-close-rules="1"></div>
-    <div class="rules-sheet">
+    <div class="rules-sheet player-rulebook-sheet">
       <div class="rules-head">
         <div>
-          <div class="rules-kicker">QUICK REFERENCE + FULL RULES</div>
-          <div id="rulesTitle" class="rules-title">How to Play</div>
+          <div class="rules-kicker">PLAYER RULEBOOK · VERSION 1.42</div>
+          <div id="rulesTitle" class="rules-title">Due for a Spanking</div>
+          <div class="rulebook-subtitle">A Cooperative Deck-Building Game · 1–4 players</div>
         </div>
         <button id="closeRulesBtn" type="button" class="rules-close" aria-label="Close rules">×</button>
       </div>
 
-      <div class="rules-objective"><strong>Objective:</strong> Cooperate to Punish 4 Bottoms before the 20-card Supply Closet runs out. The complete Rules 1.42 are available at the bottom of this panel.</div>
-
-      <details open>
-        <summary>Turn structure</summary>
-        <div class="rules-body">
-          <p>At the start of the turn, refill empty face-up Supply Closet slots to the current display limit.</p>
-          <p>You normally have <strong>1 Utility Action</strong> and <strong>3 Discipline Actions</strong>. After the third Bottom is Punished, you have 4 Discipline Actions.</p>
-          <p>During every turn you must take <strong>exactly 1 face-up Supply Closet card</strong>. Taking it does not use an action.</p>
-        </div>
-      </details>
-
-      <details>
-        <summary>Utility Actions</summary>
-        <div class="rules-body">
-          <p>You may use up to one built-in Utility Action each turn. These are not cards.</p>
-          <p><strong>Focus:</strong> Draw 1 card, then discard 1 card.</p>
-          <p><strong>Refine:</strong> Permanently remove 1 card from your discard pile.</p>
-          <p><strong>Repair:</strong> Repair 1 Broken Implement and put it into your discard pile.</p>
-          <p><strong>Action-cost exceptions:</strong> Follow Through itself does not use a Discipline Action. One More Time uses its normal Discipline Action, but the card it plays from your discard pile costs 0 additional Discipline Actions.</p>
-        </div>
-      </details>
-
-      <details>
-        <summary>Discipline Cards & Layers</summary>
-        <div class="rules-body">
-          <p>Every playable card is a Discipline Card. Playing one normally uses 1 Discipline Action.</p>
-          <p>A Bottom has three Layers in order: <strong>Clothing → Underwear → Bare</strong>. Impact reduces the current Layer's Composure. Excess Impact carries into the next Layer.</p>
-          <p>When you break at least one Layer, you normally cannot take any more Discipline Actions that turn. A remaining Utility Action may still be used.</p>
-        </div>
-      </details>
-
-      <details>
-        <summary>Position</summary>
-        <div class="rules-body">
-          <p>A Bottom may be <strong>OTK</strong>, <strong>Bent Over</strong>, or unpositioned. Position is shared by all players and remains between turns until consumed or changed.</p>
-          <p>A Position is consumed after a Discipline receives a benefit from it, unless the resolving card says otherwise. An effect that only establishes or changes Position does not consume it.</p><p><strong>Swat</strong> and <strong>Smack</strong> each gain +1 Impact while the Bottom is OTK or Bent Over, but they do <strong>not</strong> consume Position.</p>
-        </div>
-      </details>
-
-      <details>
-        <summary>Implements</summary>
-        <div class="rules-body">
-          <p>Implements have listed Impact, a Favored Position, and a Position Bonus. If the Bottom is in the Favored Position, add the Position Bonus.</p>
-          <p>Implements normally Break after use and go to the shared Broken Pile. The standard Repair Utility Action moves a repaired Implement to your discard pile.</p>
-        </div>
-      </details>
-
-      <details>
-        <summary>Progression</summary>
-        <div class="rules-body">
-          <p>Start with 2 face-up Supply Closet cards. After Bottom 1, the display limit becomes 3.</p>
-          <p>After Bottom 2, normal hand size increases from 4 to 5. After Bottom 3, normal Discipline Actions increase from 3 to 4.</p>
-          <p>Punish Bottom 4 to win. If the Supply Closet is exhausted before Bottom 4 is Punished, the players lose.</p>
-        </div>
-      </details>
-
-      <details class="full-rules-details">
-        <summary>Full Rules 1.42</summary>
-        <div class="rules-body">
-          <p>This is the complete canonical playtest rules document included with this build.</p>
-          <pre class="full-rules-pre"># Due for a Spanking — Playtest Rules 1.42
-
-**Version:** 1.42  
-**Purpose:** Canonical rules reference for human and simulated playtesting.
-
-## Source of Truth
-
-For playtesting, use this Rules 1.42 document together with the current **Due for a Spanking Current Design** spreadsheet.
-
-- **The spreadsheet is the master design document.** It is authoritative for the current Basic deck, Supply Closet card pool, Implements, Bottom roster, Evergreen Traits and Layer Traits, Locations, numerical values, effect text, flavor text, and art keys.
-- **This rules document is authoritative for global rules, timing, vocabulary, setup procedure, and turn structure.**
-- The spreadsheet&#x27;s **Internal Doc** tab is not game data and must be ignored during playtesting and app builds.
-- Blank rows in game-data tabs are ignored.
-- If older prototype vocabulary remains in the spreadsheet, translate it using the Vocabulary Normalization table below.
-- Specific card, Evergreen Trait, Layer Trait, or Location text may create an explicit exception to a general rule.
-- When a current spreadsheet effect conflicts with duplicated card/Bottom data in an older rules document or app build, **use the spreadsheet**.
-
-## 1. Vocabulary Normalization
-
-| Old / Prototype Term | Rules 1.42 Term |
-|---|---|
-| Boss | Bottom |
-| Challenge | Trait / Evergreen Trait |
-| Defeat | Punish |
-| Fight | Encounter |
-| Damage | Impact |
-| Health / HP | Composure |
-| Attack / Impact Action | Discipline Action |
-| Clothing Stage | Layer |
-| Skirt | Clothing |
-| Panties | Underwear |
-| Tag | Reach |
-| Theme | Type |
-| Round | Turn, where applicable |
-
-### Core Terms
-
-**Bottom** — The character being faced during the current Encounter.
-
-**Encounter** — The period spent facing one Bottom at one Location.
-
-**Punish** — Reduce the Bare Layer of the current Bottom to 0 Composure.
-
-**Composure** — The amount of punishment a Layer can take before it breaks.
-
-**Impact** — The numerical amount that reduces Composure.
-
-**Position Bonus** — The bonus Impact an Implement adds when the Bottom is in its Favored Position. For example, the Cane has 2 Impact and a +5 Position Bonus, so it deals 7 Impact while Bent Over.
-
-**Discipline Card** — Every playable card in the game is a Discipline Card. This includes Basic cards, Implements, and non-Implement Supply Closet cards. There is no Utility Card type.
-
-**Discipline Action** — The action normally used to play a Discipline Card. Playing any Discipline Card uses one Discipline Action unless an effect explicitly says otherwise. Discipline Actions and Utility Actions are separate systems.
-
-**Utility Action** — One of three built-in actions available each turn: Focus, Refine, or Repair. Utility Actions are not cards and there is no Utility Card type.
-
-**Implement** — A Discipline Card with Impact, a Favored Position, and a Position Bonus. Implements normally Break after use.
-
-**Reach** — An Implement property: Short, Long, or Flexible. **Flexible counts as both Short and Long whenever an effect checks Reach.**
-
-**Type** — An Implement property such as Domestic or School.
-
-**Position** — OTK or Bent Over. A Bottom can also be unpositioned.
-
-**Layer** — A Bottom&#x27;s Clothing, Underwear, or Bare Layer.
-
-**Broken Pile** — A shared central pile containing all Broken Implements.
-
-**Evergreen Trait** — A Bottom&#x27;s persistent special rule. It remains active for the entire Encounter. The spreadsheet column &quot;Evergreen Trait&quot; is the source of truth for this effect.
-
-## 2. Players and Objective
-
-The game currently supports **1–4 players**.
-
-Players cooperate to Punish **four Bottoms** before the 20-card Supply Closet runs out.
-
-The fourth Bottom being Punished wins the game.
-
-Player-count balance is a 1.4 playtest target and may change after testing.
-
-## 3. Starting Deck
-
-Each player begins with the same **8-card Basic deck**. Build it from the current spreadsheet&#x27;s **Basic Cards** tab.
-
-For Rules 1.42, the starting deck is:
-
-| Card | Qty | Rules 1.42 Effect |
-|---|---:|---|
-| **Swat** | 4 | Deal **1 Impact**. Deal **+1 Impact** while the Bottom is OTK or Bent Over. This does **not** consume Position. |
-| **Turn Around** | 2 | Put the Bottom **OTK or Bent Over**. This does **not** consume Position. |
-| **Find the Rhythm** | 2 | Deal **1 Impact**, then draw 1 card. |
-
-Shuffle your Basic deck and draw **4 cards**.
-
-After the second Bottom is Punished, each player&#x27;s normal hand size becomes **5**.
-
-The spreadsheet is authoritative if the Basic deck changes in a later design version.
-
-## 4. Build the Supply Closet
-
-Each game uses exactly **20 Supply Closet cards**:
-
-- Randomly select **8 Implements** from the current Implement list.
-- Randomly select **12 non-Implement Discipline Cards** from the current non-Implement Supply Closet list.
-- Shuffle all 20 together to form the Supply Closet deck.
-
-Reveal **2 cards** face up.
-
-After the first Bottom is Punished, the normal number of face-up Supply Closet cards becomes **3**.
-
-## 5. Prepare the Bottoms
-
-Shuffle the Bottom cards.
-
-Reveal the top Bottom for the first Encounter. Future Bottoms are not revealed in advance.
-
-Bottoms are drawn without replacement unless an effect specifically says otherwise.
-
-Each new Bottom begins **unpositioned** unless a Trait or other effect says otherwise.
-
-## 6. Prepare the Location
-
-Shuffle the Location cards and reveal one for the first Encounter.
-
-A Location remains active for that Encounter unless an effect changes it.
-
-When an Encounter ends:
-
-1. Return the current Location to the Location deck.
-2. Shuffle the Location deck.
-3. Reveal a new Location for the next Encounter.
-
-Because the previous Location is shuffled back in, the same Location may appear in consecutive Encounters.
-
-## 7. Layers and Composure
-
-Every Bottom has three Layers, in order:
-
-1. **Clothing**
-2. **Underwear**
-3. **Bare**
-
-Unless a Trait says otherwise, each Layer begins with **10 Composure**.
-
-The current Layer is always the first unbroken Layer.
-
-Impact reduces the Composure of the current Layer.
-
-When a Layer reaches 0 Composure, it breaks.
-
-### Excess Impact
-
-Excess Impact carries into the next Layer.
-
-Example: the Clothing Layer has 3 Composure remaining and an effect deals 7 Impact. The first 3 breaks Clothing and the remaining 4 reduces Underwear.
-
-A single effect can break multiple Layers if it deals enough Impact.
-
-### Breaking a Layer Ends Further Discipline Actions
-
-Once you break at least one Layer during your turn, you may not take any additional Discipline Actions that turn unless an effect explicitly allows you to continue.
-
-You may still use a remaining Utility Action and complete other legal non-Discipline parts of the turn.
-
-Breaking a Layer does **not** remove the Bottom&#x27;s Position by itself.
-
-## 8. Layer Traits
-
-Each Bottom has one **Evergreen Trait** that remains active for the entire Encounter.
-
-A Bottom may also have a **Clothing Layer Trait** and a **Bare Layer Trait**.
-
-- The **Clothing Layer Trait** is active only while the Bottom is on her Clothing Layer.
-- The **Underwear Layer** has no additional Layer Trait unless the spreadsheet specifically gives that Bottom one.
-- The **Bare Layer Trait** is active only while the Bottom is on her Bare Layer.
-- When a Layer breaks, its Layer Trait stops applying immediately and the next Layer&#x27;s Trait becomes active.
-- Layer Traits stack with the Bottom&#x27;s Evergreen Trait, Location effects, Position modifiers, Discipline Cards, and Implement modifiers unless an effect explicitly says otherwise.
-- Layer Trait names and effects are read directly from the current spreadsheet. Do not use a hard-coded Bottom assignment table in a playtest app.
-
-This creates the intended progression: **Clothing = more protected -&gt; Underwear = baseline -&gt; Bare = more vulnerable.**
-
-### Layer Trait Clarifications
-
-- A Layer Trait only applies to the current Layer.
-- Breaking a Layer removes its Layer Trait immediately.
-- Excess Impact still carries into the next Layer normally.
-- An Evergreen Trait remains active across all three Layers.
-- If a Layer Trait changes a Layer&#x27;s starting Composure, use the value stated in the spreadsheet.
-- Recovery effects can never raise the current Layer above its starting Composure.
-
-## 9. Positions
-
-There are two Positions:
-
-- **OTK**
-- **Bent Over**
-
-A Bottom can also be **unpositioned**.
-
-Position is shared by all players. A Position left in place at the end of one player&#x27;s turn remains available to the next player.
-
-### Standard Utility Actions
-
-Each turn, a player may take **one** of the following three Utility Actions:
-
-These are built-in turn options, **not cards**. Playing a Discipline Card never uses your Utility Action unless a specific effect explicitly says otherwise.
-
-| Utility Action | Effect |
-|---|---|
-| **Focus** | Draw **1 card**, then discard **1 card**. |
-| **Refine** | Permanently remove **1 card from your discard pile** from the game. |
-| **Repair** | Repair **1 Broken Implement** from the shared Broken Pile and put it into your discard pile. |
-
-**Refine clarification:** Refine may remove any card that is currently in your discard pile, including a Basic card, non-Implement Discipline Card, or Implement. It cannot remove a Broken Implement from the shared Broken Pile because that card is not in your discard pile.
-
-Position may be changed only by Discipline Cards, Evergreen Traits, Locations, or other effects that explicitly change Position.
-
-### Consuming Position
-
-A Position is consumed after a Discipline receives a **benefit from that Position**, unless the resolving card explicitly says the Position is not consumed.
-
-**Swat** is the current Basic-card example of this exception: it gains +1 Impact while the Bottom is Positioned, but its card text says it does **not** consume Position.
-
-
-A Discipline that only establishes or changes Position does **not** consume it unless the card says otherwise.
-
-If a Discipline receives a Position-based benefit, resolve the entire Discipline first, then consume the Position.
-
-Position-based benefits include adding an Implement&#x27;s Position Bonus, gaining bonus Impact, or receiving another effect specifically because the Bottom is in that Position.
-
-An effect that says a Position is not consumed overrides this rule.
-
-Examples:
-
-- **Turn Around** puts the Bottom into a Position. Because it only establishes or changes Position, the Position remains.
-- **Over My Knee** puts the Bottom OTK. The Position remains.
-- **Hairbrush** used while the Bottom is OTK adds its Position Bonus to its Impact. Resolve the Hairbrush, then consume OTK.
-- **Don&#x27;t Move** can prevent that Position from being consumed.
-
-## 10. Implements
-
-Each Implement has:
-
-- **Reach:** Short, Long, or Flexible
-- **Impact**
-- **Favored Position**
-- **Position Bonus**
-- **Type:** such as Domestic or School
-
-### Using an Implement
-
-Playing an Implement uses a Discipline Action unless an effect says otherwise.
-
-If the Bottom is not in the Implement&#x27;s Favored Position, it deals its listed Impact.
-
-If the Bottom is in the Implement&#x27;s Favored Position, add its Position Bonus to its Impact.
-
-A Flexible Implement with **Either** as its Favored Position adds its Position Bonus while the Bottom is either OTK or Bent Over. For Reach-based effects, **Flexible counts as both Short and Long**, so effects that apply to either Reach also apply to a Flexible Implement.
-
-**Position Bonus** is printed directly on the Implement. For example, the Cane has 2 Impact and a +5 Position Bonus, so it deals 7 Impact while Bent Over.
-
-Location bonuses, Trait modifiers, card bonuses, and Position bonuses stack unless an effect says otherwise.
-
-### Breaking Implements
-
-After an Implement is used, it normally **Breaks**.
-
-Place it in the shared Broken Pile in the center of the table instead of the player&#x27;s discard pile.
-
-A Broken Implement is not owned by the player who originally acquired it.
-
-When an effect repairs a Broken Implement, put it where that effect directs. The standard **Repair** Utility Action puts it into your discard pile; **Refurbish** puts it directly into your hand.
-
-Effects can prevent an Implement from Breaking or move it somewhere else instead.
-
-## 11. Turn Structure
-
-There are **no rounds**. Play proceeds in turns.
-
-At the start of a normal turn:
-
-1. Refill empty face-up Supply Closet slots to the current display limit.
-2. The player begins their turn with their current hand.
-
-During the turn, the player has:
-
-- **1 Utility Action**
-- **3 Discipline Actions**
-
-After the third Bottom is Punished, players instead have:
-
-- **1 Utility Action**
-- **4 Discipline Actions**
-
-Actions may be taken in **any order**.
-
-Players do not have to use all available actions.
-
-### Mandatory Supply Closet Draw
-
-Every turn, the active player **must take exactly 1 face-up Supply Closet card**.
-
-- This may happen at any point during the turn.
-- Put the chosen card directly into your hand.
-- You may play it during the same turn.
-- Taking the required Supply Closet card does not itself use a Utility Action or Discipline Action.
-- You may not take a second Supply Closet card that turn unless a card or effect explicitly allows you to do so.
-- The empty face-up slot is not refilled immediately. It is refilled at the start of the next turn.
-
-If a card or effect explicitly allows additional Supply Closet cards to be taken, that exception overrides the one-card limit.
-
-### Ending the Turn
-
-After the player finishes taking actions:
-
-1. Resolve any end-of-turn effects, including Bottom or Location recovery.
-2. Discard all unplayed cards remaining in hand.
-3. Put played cards into the appropriate destination. Normal non-Implement cards go to the player&#x27;s discard pile; Broken Implements go to the shared Broken Pile.
-4. Draw a fresh hand from the player&#x27;s deck.
-
-Normal draw size:
-
-- **4 cards** before the second Bottom is Punished.
-- **5 cards** after the second Bottom is Punished.
-
-If the deck does not contain enough cards, shuffle that player&#x27;s discard pile to form a new deck and continue drawing.
-
-## 12. Supply Closet Progression
-
-The Supply Closet begins with **2 face-up cards**.
-
-### After the First Bottom Is Punished
-
-The face-up Supply Closet limit increases to **3**.
-
-At the start of the next turn, refill the Supply Closet up to 3 cards.
-
-### After the Second Bottom Is Punished
-
-Normal hand size increases from **4 to 5**.
-
-This applies to the next normal draw, including the end-of-turn draw of the player who Punished the second Bottom.
-
-### After the Third Bottom Is Punished
-
-Normal Discipline Actions increase from **3 to 4 per turn**.
-
-### After the Fourth Bottom Is Punished
-
-The players win.
-
-## 13. Evergreen Traits
-
-Each Bottom has one **Evergreen Trait** in addition to any Layer Traits.
-
-The Evergreen Trait remains active throughout all three Layers of that Bottom&#x27;s Encounter unless an effect ignores or modifies it.
-
-Read the current Bottom roster and all Evergreen/Layer Trait text from the spreadsheet&#x27;s **Bottoms** tab. Do not hard-code a Bottom roster into a playtest build.
-
-When a Trait recovers Composure, it restores Composure only to the current Layer and can never exceed that Layer&#x27;s starting Composure.
-
-Already-broken Layers remain broken.
-
-## 14. Locations
-
-Each Encounter normally has one active Location.
-
-The Location&#x27;s effect remains active throughout the Encounter unless another effect replaces it.
-
-Location modifiers stack with card, Implement, Position, and Trait modifiers unless an effect states otherwise.
-
-If a Location causes recovery, recovery can never raise the current Layer above its starting Composure.
-
-## 15. Punishing a Bottom and Starting the Next Encounter
-
-A Bottom is **Punished** when her Bare Layer reaches 0 Composure.
-
-Finish resolving the effect that reduced Bare to 0.
-
-The current Encounter then ends.
-
-Apply the appropriate progression reward:
-
-- **Bottom 1:** Supply Closet display increases to 3.
-- **Bottom 2:** Hand size increases to 5.
-- **Bottom 3:** Discipline Actions increase to 4.
-- **Bottom 4:** The players win.
-
-If fewer than four Bottoms have been Punished, finish the current player&#x27;s turn. The next Encounter begins at the start of the next player&#x27;s turn:
-
-1. Reveal the next Bottom.
-2. Return the old Location to the Location deck and shuffle.
-3. Reveal a Location for the new Encounter.
-4. Set the new Bottom&#x27;s Layers to their starting Composure.
-5. Begin the Bottom unpositioned unless an effect says otherwise.
-6. Apply any Encounter-start instructions from the Bottom or Location.
-
-## 16. Running Out of Supply Closet Cards
-
-The 20-card Supply Closet is the game clock.
-
-When the final Supply Closet card is taken, the active player finishes that turn normally.
-
-If the fourth Bottom is Punished by the end of that turn, the players win.
-
-If the fourth Bottom has not been Punished when that turn ends, the players lose.
-
-This rule applies whether the final card was the player&#x27;s normal required Supply Closet card or was taken because an effect allowed an additional card.
-
-## 17. Timing and Rules Precedence
-
-Use the following conventions during playtesting:
-
-1. **Specific text overrides general rules.**
-2. Resolve a card or action completely before starting another action.
-3. Apply all applicable modifiers unless an effect says they do not stack.
-4. If multiple effects controlled by the players occur at the same time and no order is specified, the active player chooses their order.
-5. A Position is consumed only after a Discipline that benefited from that Position fully resolves. A Discipline that only establishes or changes Position does not consume it.
-6. Breaking a Layer prevents further Discipline Actions that turn, but does not cancel the action currently resolving.
-7. Excess Impact always carries forward to the next Layer.
-8. Recovery never restores a broken Layer.
-9. When a Layer breaks, its Layer Trait stops applying immediately and the next Layer&#x27;s Trait becomes active before excess Impact continues resolving.
-10. Legacy spreadsheet wording is translated through the Rules 1.42 vocabulary table rather than interpreted as a separate mechanic.
-
-## 18. Rules 1.42 Card-Wording Conventions
-
-When reading current or older prototype material during playtesting, interpret legacy wording as follows:
-
-- &quot;deal X damage&quot; -&gt; **deal X Impact**
-- &quot;HP&quot; or &quot;health&quot; -&gt; **Composure**
-- &quot;boss&quot; -&gt; **Bottom**
-- &quot;attack&quot; or &quot;Impact Action&quot; -&gt; **Discipline Action**
-- &quot;Positioned Damage&quot; or &quot;Positioned Impact&quot; -&gt; **Impact + Position Bonus**
-- &quot;Positioned Impact bonus&quot; or &quot;Position bonus Impact&quot; -&gt; **Position Bonus**
-- &quot;Base Impact&quot; or &quot;Base damage&quot; -&gt; **Impact**
-- &quot;bonus damage&quot; -&gt; **bonus Impact**
-- &quot;clothing stage&quot; -&gt; **Layer**
-- &quot;Skirt&quot; -&gt; **Clothing**
-- &quot;Panties&quot; -&gt; **Underwear**
-- &quot;this round&quot; -&gt; **this turn**
-- Implement &quot;Tag&quot; -&gt; **Reach**
-- Implement &quot;theme&quot; -&gt; **Type**
-- &quot;persistent Trait&quot; -&gt; **Evergreen Trait**
-
-The current spreadsheet&#x27;s effect text always takes precedence over older duplicated card text.
-
-Two current 1.42 wording clarifications are especially important for action accounting:
-
-- **Built to Last:** the protected Implement does not Break; after it resolves, put it in the player&#x27;s discard pile instead.
-- **Follow Through:** play it immediately after an Implement deals Impact. Playing Follow Through itself does **not** use a Discipline Action; then deal 3 additional Impact.
-- **One More Time:** playing One More Time uses its normal Discipline Action, but the card played from the discard pile as part of its resolution does **not** use an additional Discipline Action.
-
-## 19. Quick Reference
-
-### Start of Game
-
-- Players: 1–4
-- Bottoms to Punish: 4
-- Starting hand: 4
-- Starting deck: 8 Basic cards
-- Supply Closet: 20 cards
-  - 8 random Implements
-  - 12 random non-Implement Discipline Cards
-- Face-up Supply Closet cards: 2
-- Utility Actions per turn: 1 (choose Focus, Refine, or Repair)
-- Discipline Actions per turn: 3
-- Standard Layer Composure: 10
-- Positions: OTK / Bent Over
-
-### Progression
-
-| Milestone | Reward |
-|---|---|
-| Punish Bottom 1 | Supply Closet display increases to 3 |
-| Punish Bottom 2 | Hand size increases to 5 |
-| Punish Bottom 3 | Discipline Actions increase to 4 |
-| Punish Bottom 4 | Win |
-
-### Turn Reminder
-
-1. Refill face-up Supply Closet slots.
-2. Take exactly 1 face-up Supply Closet card sometime during the turn.
-3. Use up to 1 Utility Action: Focus, Refine, or Repair.
-4. Use up to 3 Discipline Actions, or 4 after Bottom 3.
-5. Actions may occur in any order.
-6. If you break a Layer, no more Discipline Actions that turn unless an effect says otherwise.
-7. Resolve end-of-turn effects.
-8. Discard remaining cards.
-9. Draw a fresh hand.
-
-## 20. Playtest Protocol
-
-When using these rules with the current spreadsheet for a real or simulated playtest:
-
-- Treat the current spreadsheet as the master game-content document.
-- **Ignore the Internal Doc tab.**
-- Ignore blank rows in game-data tabs.
-- Build each player&#x27;s Basic deck from the **Basic Cards** tab and its Qty column.
-- Randomize the Supply Closet according to the **8 Implement / 12 non-Implement** rule using only cards currently present in the spreadsheet.
-- Randomize Bottom order using only nonblank Bottom rows and keep future Bottoms hidden.
-- Randomize each Encounter&#x27;s Location according to the Location rules.
-- Apply the current Bottom&#x27;s Evergreen Trait plus the appropriate Clothing or Bare Layer Trait from the spreadsheet.
-- Use the spreadsheet&#x27;s current numerical values and effect text even if an older app or rules copy contains different card/Bottom data.
-- Do not invent cards, Implements, Bottoms, Locations, values, Traits, flavor text, or art mappings that are not supported by the spreadsheet.
-
-For useful balance analysis, record:
-
-- Player count
-- Supply Closet composition
-- Bottom order
-- Location for each Encounter
-- Number of turns taken
-- Supply Closet cards remaining when each Bottom is Punished
-- Cards acquired by each player
-- Broken/repair activity
-- Any rule ambiguity encountered
-- Final win/loss result
-- Whether any cards, Bottoms, Implements, or Locations felt unusually weak, strong, automatic, or irrelevant
-
-These records should be treated as playtest observations, not automatic balance conclusions. Multiple tests across player counts and randomized setups should be compared before changing Rules 1.42.
-
-## 21. Playtest App Presentation Requirements
-
-These requirements are for digital playtest implementations and do not change tabletop gameplay.
-
-
-### Required Utility Action in the Playtest App
-
-This is a **digital playtest-app requirement only**. It does not change the tabletop rule that a player may choose whether to use their Utility Action.
-
-In the playtest app:
-
-- The active player must use **exactly 1 Utility Action** before ending their turn.
-- The **End Turn** control must remain unavailable while the Utility Action is unused.
-- The Utility Action area should be visibly marked **Required** until the player uses **Focus**, **Refine**, or **Repair**.
-- Once a Utility Action has been used, the requirement is satisfied for that turn and the app should not allow a second Utility Action unless a specific effect explicitly grants one.
-- This enforcement exists to prevent accidental skipping during digital playtesting and should not be interpreted as a change to the physical-game rules.
-
-
-### Configurable Supply Closet Composition in the Playtest App
-
-This is a **digital playtest-app requirement only**. It does not change the default tabletop setup unless a later rules version explicitly does so.
-
-At game setup, the playtest app must allow the user to choose:
-
-- the number of **Implements** in the Supply Closet
-- the number of **non-Implement Discipline Cards** in the Supply Closet
-
-The app should automatically show the resulting **total Supply Closet size**.
-
-Default values remain:
-
-- **8 Implements**
-- **12 non-Implement Discipline Cards**
-- **20 total Supply Closet cards**
-
-The app must build the Supply Closet by randomly selecting the chosen number of Implements and non-Implement Discipline Cards from the current spreadsheet pools, then shuffle them together.
-
-The selected Implement count, non-Implement count, and total Supply Closet size should be recorded in the playtest results so different configurations can be compared across games.
-
-### Spreadsheet-Driven Content
-
-The current spreadsheet is the source of truth for all game content.
-
-The app should read the following from the spreadsheet rather than maintaining hard-coded copies:
-
-- Basic Card quantities, names, effects, and flavor text
-- non-Implement Supply Closet card names, effects, and flavor text
-- Implement Impact, Position Bonus, Reach, Type, Favored Position, flavor text, and Art Name when provided
-- Bottom names, Evergreen Traits, Layer Traits, flavor text, and Art Name when provided
-- Location names, effects, flavor text, and Art Name when provided
-
-The **Internal Doc** tab must be ignored.
-
-### Flavor Text
-
-Display flavor text from the spreadsheet for **every game component that has a Flavor text field**.
-
-Flavor text is presentation only unless an effect explicitly says otherwise.
-
-### Artwork
-
-When a spreadsheet row has a nonblank **Art Name** value:
-
-- Treat that value as the image key.
-- Match it to an uploaded project image named **`&lt;Art Name&gt;.png`**.
-- Do not require `.png` to be written in the spreadsheet cell.
-- If the referenced image is not available, continue the playtest without inventing or substituting artwork.
-
-### Positioning Choices Belong With Discipline Cards
-
-Position is **not** a Utility Action.
-
-When a Discipline Card requires the player to choose **OTK** or **Bent Over**, the app must present that choice as part of resolving that Discipline Card.
-
-- Show the OTK / Bent Over selection **under or adjacent to the Discipline Card being resolved**, in the Discipline Cards/hand area.
-- Do not place Position choices in the Utility Action area.
-- Do not spend or disable the player&#x27;s Utility Action when a Discipline Card establishes or changes Position.
-- The Discipline Action used to play the card is spent normally unless the card or another effect says otherwise.
-
-Examples include **Turn Around**, **Perfect Setup**, and any other current Discipline Card that establishes or changes Position.
-
-### No Stale Hard-Coded Lists
-
-Do not substitute an older hard-coded card list, Bottom roster, Trait list, flavor text, or numerical value when the current spreadsheet contains newer content.
-</pre>
-        </div>
-      </details>
+      <div class="rulebook-pages">
+        <section class="rulebook-page">
+          <h3>Goal</h3>
+          <p>Work together to Punish four Bottoms. Each Bottom has three Layers — <strong>Clothing, Underwear, Bare</strong> — and each Layer normally starts at 10 Composure. Deal Impact to reduce Composure. When Bare reaches 0, that Bottom is Punished.</p>
+
+          <h3>Setup</h3>
+          <ol>
+            <li>Each player takes an 8-card Basic deck: <strong>4 Swat, 2 Turn Around, 2 Find the Rhythm</strong>. Shuffle and draw 4.</li>
+            <li>Build the Supply Closet using the playtest setup shown on the start screen. The standard setup is <strong>8 Implements + 12 other Supply Closet cards</strong>. Shuffle and reveal 2.</li>
+            <li>Shuffle the Bottoms and reveal 1. Keep future Bottoms hidden.</li>
+            <li>Shuffle Locations and reveal 1. Set the Bottom’s Clothing Layer to its starting Composure.</li>
+          </ol>
+
+          <h3>Your Turn</h3>
+          <p>Take these in any order. In the digital playtest app, the Utility Action is required before you can end your turn.</p>
+          <table class="rulebook-table">
+            <tr><th>You get</th><th>Normally</th></tr>
+            <tr><td>Utility Action</td><td>1</td></tr>
+            <tr><td>Discipline Actions</td><td>3</td></tr>
+            <tr><td>Supply Closet card</td><td>Exactly 1</td></tr>
+          </table>
+
+          <h4>1) Take a Supply Closet card</h4>
+          <p>Take 1 face-up card into your hand. You may play it immediately. This costs no action. Do not refill the empty slot until the start of the next turn.</p>
+
+          <h4>2) Use a Utility Action</h4>
+          <table class="rulebook-table">
+            <tr><th>Action</th><th>Effect</th></tr>
+            <tr><td><strong>Focus</strong></td><td>Draw 1, then discard 1.</td></tr>
+            <tr><td><strong>Refine</strong></td><td>Permanently remove 1 card from your discard pile.</td></tr>
+            <tr><td><strong>Repair</strong></td><td>Repair 1 Implement from the Broken Pile and put it in your discard pile.</td></tr>
+          </table>
+          <p>Utility Actions are not cards. Position is not a Utility Action.</p>
+
+          <h4>3) Play Discipline Cards</h4>
+          <p>Every playable card is a Discipline Card. Playing one normally costs 1 Discipline Action unless its text says otherwise.</p>
+
+          <h4>4) End your turn</h4>
+          <p>Resolve end-of-turn effects. Discard unplayed cards and played non-Implements. Broken Implements go to the shared Broken Pile. Draw a fresh hand of 4.</p>
+        </section>
+
+        <section class="rulebook-page">
+          <h3>Position & Implements</h3>
+          <ul>
+            <li>A Bottom may be <strong>OTK</strong>, <strong>Bent Over</strong>, or unpositioned. Position is shared between players.</li>
+            <li>A Position is consumed after a Discipline benefits from it, unless card text says otherwise. Simply establishing or changing Position does not consume it.</li>
+            <li>An Implement deals its listed Impact. In its Favored Position, add its Position Bonus. Example: Cane 2 Impact +5 Position Bonus = 7 while Bent Over.</li>
+            <li><strong>Flexible counts as both Short and Long whenever an effect checks Reach.</strong></li>
+            <li>After use, an Implement normally Breaks and goes to the shared Broken Pile.</li>
+          </ul>
+
+          <h3>Layers, Traits & Locations</h3>
+          <ul>
+            <li>Layer order is <strong>Clothing → Underwear → Bare</strong>. Excess Impact carries into the next Layer.</li>
+            <li>Once you break a Layer during your turn, you may not take more Discipline Actions that turn unless an effect says you can. You may still use a remaining Utility Action.</li>
+            <li>Each Bottom has an Evergreen Trait. Clothing and Bare may also have their own Layer Trait. Only the current Layer’s Trait is active.</li>
+            <li>The active Location stays in effect for the Encounter unless a card changes it. Card, Trait, Location, and Position modifiers stack unless text says otherwise.</li>
+            <li>Recovery cannot raise the current Layer above its starting Composure. Broken Layers do not recover.</li>
+          </ul>
+
+          <h3>Punishing a Bottom</h3>
+          <p>When Bare reaches 0, finish resolving that Discipline. The Bottom is Punished and the Encounter ends. Finish the active player’s turn. At the start of the next player’s turn, reveal the next Bottom and shuffle the old Location back into the Location deck before revealing a new one. The new Bottom normally begins unpositioned.</p>
+
+          <h3>Progression</h3>
+          <table class="rulebook-table">
+            <tr><th>After…</th><th>Reward</th></tr>
+            <tr><td>1st Bottom</td><td>Supply Closet display increases from 2 to 3.</td></tr>
+            <tr><td>2nd Bottom</td><td>Normal hand size increases from 4 to 5.</td></tr>
+            <tr><td>3rd Bottom</td><td>Discipline Actions increase from 3 to 4 per turn.</td></tr>
+            <tr><td>4th Bottom</td><td>You win.</td></tr>
+          </table>
+
+          <h3>The Supply Closet Is the Clock</h3>
+          <p>When the final Supply Closet card is taken, finish that turn. If the fourth Bottom has been Punished by the end of the turn, you win. Otherwise, you lose.</p>
+
+          <h3>Important Card Timing</h3>
+          <ul>
+            <li><strong>Swat:</strong> gets its printed Position bonus without consuming Position.</li>
+            <li><strong>Built to Last:</strong> the next Implement does not Break; after resolving it, put it in your discard pile instead.</li>
+            <li><strong>Follow Through:</strong> play it immediately after an Implement deals Impact. Follow Through costs no Discipline Action, then deals 3 additional Impact.</li>
+            <li>Specific card, Trait, or Location text overrides a general rule.</li>
+          </ul>
+
+          <h3>End-of-Turn Checklist</h3>
+          <table class="rulebook-table">
+            <tr><th>Check</th><th>Do this</th></tr>
+            <tr><td>Supply Closet</td><td>Did you take exactly 1 face-up card?</td></tr>
+            <tr><td>Utility</td><td>In this digital playtest app, use your required Utility Action.</td></tr>
+            <tr><td>Effects</td><td>Resolve recovery and other end-of-turn effects.</td></tr>
+            <tr><td>Clean up</td><td>Discard remaining hand; send Broken Implements to Broken Pile.</td></tr>
+            <tr><td>Draw</td><td>Draw 4 cards, or 5 after the 2nd Bottom.</td></tr>
+          </table>
+
+          <p class="rulebook-footer-note"><strong>When in doubt, read the card.</strong> The current game spreadsheet is the master source for card, Bottom, Implement, and Location text.</p>
+        </section>
+      </div>
     </div>
   </div>
 
-  <div id="choiceModal" class="choice-modal hidden" role="dialog" aria-modal="true" aria-labelledby="choiceModalTitle">
+<div id="choiceModal" class="choice-modal hidden" role="dialog" aria-modal="true" aria-labelledby="choiceModalTitle">
     <div class="choice-backdrop"></div>
     <div class="choice-sheet">
       <div class="choice-handle" aria-hidden="true"></div>
@@ -1442,7 +946,7 @@ Do not substitute an older hard-coded card list, Bottom roster, Trait list, flav
 
 <script>
 (()=>{
-/* DUE FOR A SPANKING BUILD: 1.42 UX2 / DESKTOP STICKY HUD / GUIDED END TURN / LATEST FULL RULES */
+/* DUE FOR A SPANKING BUILD: 1.42 UX4 / BOTTOM AREA REWORK */
 const root=document.getElementById('dbg12-art'); if(root.dataset.ready)return; root.dataset.ready='1';
 const $=s=>root.querySelector(s), cp=o=>{ if (typeof structuredClone==='function') return structuredClone(o); return JSON.parse(JSON.stringify(o)); };
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
