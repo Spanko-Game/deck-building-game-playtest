@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f3d48"><title>Spanko — Cooperative Deck-Building Game · Rules 1.41</title><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f3d48"><title>Spanko — Cooperative Deck-Building Game · Rules 1.42</title><style>
 :root{
   --viz-text:#2c211c;--viz-muted:#78665c;--viz-card:#fffaf2;--viz-panel:#f7efe4;
   --viz-border:#ddcdbd;--viz-accent:#8f3d48;--viz-accent-bg:#8f3d48;
@@ -531,7 +531,7 @@ body.overlay-open{overflow:hidden}
   <div id="setup" class="intro-screen">
     <div class="intro-kicker">A COOPERATIVE DECK-BUILDING GAME</div>
     <h1 class="intro-title">Spanko</h1>
-    <p class="intro-copy">Work together to play Discipline cards, remove each Bottom’s clothing layer by layer, and Punish four Bottoms before the 20-card Supply Closet runs out. Build stronger decks, manage Position, and make every Discipline Action count.</p>
+    <p class="intro-copy">Work together to play Discipline cards, remove each Bottom’s clothing layer by layer, and Punish four Bottoms before the Supply Closet runs out. Build stronger decks, manage Position, and make every Discipline Action count.</p>
 
     <div class="intro-how">
       <div><strong>1.</strong><span>Take exactly 1 face-up Supply Closet card each turn.</span></div>
@@ -546,10 +546,21 @@ body.overlay-open{overflow:hidden}
           <option value="1">1 player</option><option value="2">2 players</option><option value="3">3 players</option><option value="4">4 players</option>
         </select>
       </label>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <label class="intro-label">Supply Implements
+          <select id="supplyImplementCount" class="intro-select"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8" selected>8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option></select>
+        </label>
+        <label class="intro-label">Other Supply cards
+          <select id="supplyNonImplementCount" class="intro-select"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12" selected>12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option></select>
+        </label>
+      </div>
+      <div class="rounded-lg border border-[var(--viz-border)] bg-[var(--viz-panel)] px-3 py-2 text-sm">
+        Supply Closet total: <strong id="supplySetupTotal">20</strong> cards
+      </div>
       <button type="submit" class="intro-primary">Start randomized game</button>
       <button id="introRulesBtn" type="button" class="intro-secondary">How to Play</button>
     </form>
-    <div class="intro-version">Rules 1.41 playtest</div>
+    <div class="intro-version">Rules 1.42 playtest</div>
   </div>
 
   <div id="game" class="hidden space-y-4">
@@ -610,7 +621,7 @@ body.overlay-open{overflow:hidden}
 
     <section class="rounded-xl border border-[var(--viz-border)] bg-[var(--viz-card)] p-4">
       <div class="flex flex-wrap items-start justify-between gap-2">
-        <div><div class="font-semibold">Utility Action</div><div class="mt-1 text-sm text-[var(--viz-muted)]">Use up to one per turn: Focus, Refine, or Repair. Position is changed only by card/effect text.</div></div>
+        <div><div class="font-semibold">Utility Action</div><div class="mt-1 text-sm text-[var(--viz-muted)]">Required each turn in this playtest app: use exactly one — Focus, Refine, or Repair. Position is changed only by card/effect text.</div></div>
         <div id="utilityStatus" class="text-sm font-semibold"></div>
       </div>
       <div class="mt-4 grid gap-2 sm:grid-cols-3">
@@ -746,7 +757,7 @@ body.overlay-open{overflow:hidden}
 
 <script>
 (()=>{
-/* SPANKO BUILD: 1.41-LAYER-ART-FIX2 */
+/* SPANKO BUILD: 1.42 / CONFIGURABLE SUPPLY / REQUIRED UTILITY / REACTIVE FOLLOW THROUGH / FLEXIBLE REACH BONUSES / LAYERED ART */
 const root=document.getElementById('dbg12-art'); if(root.dataset.ready)return; root.dataset.ready='1';
 const $=s=>root.querySelector(s), cp=o=>{ if (typeof structuredClone==='function') return structuredClone(o); return JSON.parse(JSON.stringify(o)); };
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -775,7 +786,7 @@ const STARTING=[]; BASIC.forEach(c=>{for(let i=0;i<c.qty;i++)STARTING.push({...c
 
 const IMPLEMENTS=[{"name":"Hairbrush","implement":true,"supplyCard":true,"reach":"Short","impact":2,"favored":"OTK","positionBonus":2,"type":"Domestic","effect":"2 Impact · +2 Position Bonus (OTK) · Short · Domestic","flavor":"It was supposed to be for getting ready. Plans changed."},{"name":"Wooden Spoon","implement":true,"supplyCard":true,"reach":"Short","impact":2,"favored":"OTK","positionBonus":1,"type":"Domestic","effect":"2 Impact · +1 Position Bonus (OTK) · Short · Domestic","flavor":"Straight from the kitchen drawer—and suddenly much more persuasive."},{"name":"Bathbrush","implement":true,"supplyCard":true,"reach":"Short","impact":4,"favored":"OTK","positionBonus":2,"type":"Domestic","effect":"4 Impact · +2 Position Bonus (OTK) · Short · Domestic","flavor":"Long handle, solid weight, and definitely not being used for its intended purpose."},{"name":"OTK Paddle","implement":true,"supplyCard":true,"reach":"Short","impact":3,"favored":"OTK","positionBonus":2,"type":"Domestic","effect":"3 Impact · +2 Position Bonus (OTK) · Short · Domestic","flavor":"Compact, convenient, and designed for exactly where she’s been put."},{"name":"School Paddle","implement":true,"supplyCard":true,"reach":"Long","impact":3,"favored":"Bent Over","positionBonus":3,"type":"School","effect":"3 Impact · +3 Position Bonus (Bent Over) · Long · School","flavor":"A classic lesson in why some traditions refuse to disappear."},{"name":"Belt","implement":true,"supplyCard":true,"reach":"Long","impact":2,"favored":"Bent Over","positionBonus":2,"type":"Domestic","effect":"2 Impact · +2 Position Bonus (Bent Over) · Long · Domestic","flavor":"A quick tug through the loops makes the message perfectly clear."},{"name":"Strap","implement":true,"supplyCard":true,"reach":"Long","impact":3,"favored":"Bent Over","positionBonus":2,"type":"School","effect":"3 Impact · +2 Position Bonus (Bent Over) · Long · School","flavor":"Flexible enough to sting, sturdy enough to make an impression."},{"name":"Cane","implement":true,"supplyCard":true,"reach":"Long","impact":2,"favored":"Bent Over","positionBonus":5,"type":"School","effect":"2 Impact · +5 Position Bonus (Bent Over) · Long · School","flavor":"There’s very little room for argument once this comes off the rack."},{"name":"Yardstick","implement":true,"supplyCard":true,"reach":"Long","impact":2,"favored":"Bent Over","positionBonus":1,"type":"School","effect":"2 Impact · +1 Position Bonus (Bent Over) · Long · School","flavor":"For measuring just how badly she misjudged the situation."},{"name":"Slipper","implement":true,"supplyCard":true,"reach":"Flexible","impact":2,"favored":"Either","positionBonus":2,"type":"School","effect":"2 Impact · +2 Position Bonus (Either) · Flexible · School","flavor":"Almost comically ordinary—right up until it isn’t."},{"name":"Switch","implement":true,"supplyCard":true,"reach":"Long","impact":4,"favored":"Bent Over","positionBonus":1,"type":"Domestic","effect":"4 Impact · +1 Position Bonus (Bent Over) · Long · Domestic","flavor":"Simple, old-fashioned, and considerably more memorable than it looks."}];
 
-const NONIMPS=[{"name":"Perfect Setup","supplyCard":true,"effect":"Choose OTK or Bent Over. Put the Bottom in that Position. If your next Implement this turn favors that Position, the Position is not consumed after that Implement resolves.","flavor":"There. Exactly where you wanted her."},{"name":"Refurbish","supplyCard":true,"effect":"Choose a Broken Implement from the shared Broken Pile. Repair it and put it into your hand.","flavor":"A little repair work and an old favorite is ready for another round."},{"name":"Built to Last","supplyCard":true,"effect":"The next Implement you play this turn does not Break after use.","flavor":"This one isn’t going to give out that easily."},{"name":"One More","supplyCard":true,"effect":"After you play an Implement, repeat its Impact once. The Implement still only Breaks once.","flavor":"The first one made the point. The second makes sure she remembers it."},{"name":"Change Your Grip","supplyCard":true,"effect":"Your next Short Implement may treat Bent Over as favored, or your next Long Implement may treat OTK as favored.","flavor":"Same Implement. Different angle. Much better result."},{"name":"Not Finished Yet","supplyCard":true,"effect":"After breaking a Layer, you may continue taking Discipline Actions this turn.","flavor":"She thought that was the stopping point. It wasn’t."},{"name":"Follow Through","supplyCard":true,"effect":"Playing Follow Through does not use a Discipline Action. After an Implement deals its Impact plus its Position Bonus, deal 3 additional Impact.","flavor":"Good technique means not stopping halfway through the motion."},{"name":"One More Time","supplyCard":true,"effect":"Play a card from your discard pile as part of resolving One More Time. The card played this way does not use an additional Discipline Action.","flavor":"If you’re going to do it, do it properly."},{"name":"Make It Count","supplyCard":true,"effect":"The next Implement you play this turn doubles its Position Bonus.","flavor":"A little extra, just to make absolutely certain the lesson sticks."},{"name":"Lasting Impression","supplyCard":true,"effect":"After playing an Implement, put it on top of your deck unbroken instead of Breaking it.","flavor":"Nothing fancy. Sometimes the simplest approach works just fine."},{"name":"Back to Basics","supplyCard":true,"effect":"This turn, your Swats and Smacks deal double Impact.","flavor":"The lecture is almost worse than what comes after it."},{"name":"Scolding","supplyCard":true,"effect":"Ignore the Bottom’s persistent Trait for the remainder of the current Layer.","flavor":"That excuse might have worked a moment ago. Try again."},{"name":"Follow Me","supplyCard":true,"effect":"Reveal 2 Locations. Choose 1 to replace the current Location.","flavor":"The discussion is moving somewhere considerably more private."},{"name":"Go to Your Room","supplyCard":true,"effect":"Replace the current Location with Bedroom.","flavor":"Whatever comes next apparently requires a little more space."},{"name":"Outside. Now.","supplyCard":true,"effect":"Replace the current Location with Woodshed.","flavor":"Two words, one unmistakable destination."},{"name":"Over My Knee","supplyCard":true,"effect":"Put the Bottom OTK, then draw 1 card.","flavor":"The instruction is brief. The meaning is not."},{"name":"Bend Over","supplyCard":true,"effect":"Put the Bottom Bent Over. Your next Long Implement this turn gets +1 Impact.","flavor":"You know what to do"}];
+const NONIMPS=[{"name":"Perfect Setup","supplyCard":true,"effect":"Choose OTK or Bent Over. Put the Bottom in that Position. If your next Implement this turn favors that Position, the Position is not consumed after that Implement resolves.","flavor":"There. Exactly where you wanted her."},{"name":"Refurbish","supplyCard":true,"effect":"Choose a Broken Implement from the shared Broken Pile. Repair it and put it into your hand.","flavor":"A little repair work and an old favorite is ready for another round."},{"name":"Built to Last","supplyCard":true,"effect":"The next Implement you play this turn does not Break after use. Put it in your discard pile instead.","flavor":"This one isn’t going to give out that easily."},{"name":"One More","supplyCard":true,"effect":"After you play an Implement, repeat its Impact once. The Implement still only Breaks once.","flavor":"The first one made the point. The second makes sure she remembers it."},{"name":"Change Your Grip","supplyCard":true,"effect":"Your next Short Implement may treat Bent Over as favored, or your next Long Implement may treat OTK as favored.","flavor":"Same Implement. Different angle. Much better result."},{"name":"Not Finished Yet","supplyCard":true,"effect":"After breaking a Layer, you may continue taking Discipline Actions this turn.","flavor":"She thought that was the stopping point. It wasn’t."},{"name":"Follow Through","supplyCard":true,"effect":"Play immediately after an Implement deals Impact. Playing Follow Through does not use a Discipline Action. Deal 3 additional Impact.","flavor":"Good technique means not stopping halfway through the motion."},{"name":"One More Time","supplyCard":true,"effect":"Play a card from your discard pile as part of resolving One More Time. The card played this way does not use an additional Discipline Action.","flavor":"If you’re going to do it, do it properly."},{"name":"Make It Count","supplyCard":true,"effect":"The next Implement you play this turn doubles its Position Bonus.","flavor":"A little extra, just to make absolutely certain the lesson sticks."},{"name":"Lasting Impression","supplyCard":true,"effect":"After playing an Implement, put it on top of your deck unbroken instead of Breaking it.","flavor":"Nothing fancy. Sometimes the simplest approach works just fine."},{"name":"Back to Basics","supplyCard":true,"effect":"This turn, your Swats and Smacks deal double Impact.","flavor":"The lecture is almost worse than what comes after it."},{"name":"Scolding","supplyCard":true,"effect":"Ignore the Bottom’s persistent Trait for the remainder of the current Layer.","flavor":"That excuse might have worked a moment ago. Try again."},{"name":"Follow Me","supplyCard":true,"effect":"Reveal 2 Locations. Choose 1 to replace the current Location.","flavor":"The discussion is moving somewhere considerably more private."},{"name":"Go to Your Room","supplyCard":true,"effect":"Replace the current Location with Bedroom.","flavor":"Whatever comes next apparently requires a little more space."},{"name":"Outside. Now.","supplyCard":true,"effect":"Replace the current Location with Woodshed.","flavor":"Two words, one unmistakable destination."},{"name":"Over My Knee","supplyCard":true,"effect":"Put the Bottom OTK, then draw 1 card.","flavor":"The instruction is brief. The meaning is not."},{"name":"Bend Over","supplyCard":true,"effect":"Put the Bottom Bent Over. Your next Long Implement this turn gets +1 Impact.","flavor":"You know what to do"}];
 
 const BOTTOMS=[{"name":"Librarian","persistent":{"name":"Quiet Please","effect":"Implements deal -1 Impact."},"clothing":{"name":"Demure","effect":"Clothing begins with +2 Composure."},"bare":{"name":"Smarting","effect":"School Implements deal +1 Impact."},"flavor":"She’s spent all day shushing everyone else while quietly breaking every rule herself. Apparently, overdue consequences accrue interest too."},{"name":"Flight Attendant","persistent":{"name":"Turbulence","effect":"Bent Over Disciplines deal -1 Impact."},"clothing":{"name":"Collected","effect":"Recover 1 Composure at the end of each turn."},"bare":{"name":"Vulnerable","effect":"OTK Disciplines deal +1 Impact."},"flavor":"She ignored the seatbelt sign, pocketed a few too many mini bottles, and got a little too comfortable giving orders. There may be some turbulence ahead."},{"name":"Secretary","persistent":{"name":"By Appointment Only","effect":"The first Discipline each turn deals -1 Impact."},"clothing":{"name":"Prim","effect":"Bent Over Disciplines deal -1 Impact."},"bare":{"name":"Tender","effect":"Short Implements deal +1 Impact."},"flavor":"She rescheduled three meetings, misplaced an important file, and somehow still found time for a two-hour lunch. Efficiency has finally caught up with her."},{"name":"Hotel Concierge","persistent":{"name":"Do Not Disturb","effect":"Begin the Encounter in the Hotel Room."},"clothing":{"name":"Proper","effect":"Long Implements deal -1 Impact."},"bare":{"name":"Right at Home","effect":"Domestic Implements deal +1 Impact."},"flavor":"She gave herself the best room, the best table, and the last bottle of champagne. Guest satisfaction has officially become a secondary concern."},{"name":"News Anchor","persistent":{"name":"On Air","effect":"The first Discipline each turn deals -1 Impact."},"clothing":{"name":"Demure","effect":"Clothing begins with +2 Composure."},"bare":{"name":"Off Balance","effect":"Bent Over Disciplines deal +1 Impact."},"flavor":"She promised sunshine, sent everyone out without an umbrella, and then called the downpour “unexpected.” Tonight’s forecast includes a very high chance of consequences."},{"name":"Real Estate Agent","persistent":{"name":"Open House","effect":"Change to a random Location at the start of each turn."},"clothing":{"name":"Used to It","effect":"Domestic Implements deal -1 Impact."},"bare":{"name":"Sensitive","effect":"Long Implements deal +1 Impact."},"flavor":"She scheduled three showings at once, “forgot” who had the keys, and somehow still expects the commission. Closing day may be a little uncomfortable."},{"name":"Researcher","persistent":{"name":"Overthinking","effect":"Disciplines while unpositioned deal -1 Impact."},"clothing":{"name":"Demure","effect":"Clothing begins with +2 Composure."},"bare":{"name":"Vulnerable","effect":"OTK Disciplines deal +1 Impact."},"flavor":"Her latest breakthrough: the cure for procrastination is consequences."},{"name":"Heiress","persistent":{"name":"Spoiled","effect":"The first Discipline each turn gets no bonus Impact from Position."},"clothing":{"name":"Squirmy","effect":"OTK Disciplines deal -1 Impact."},"bare":{"name":"Already Sorry","effect":"Bare begins with -2 Composure."},"flavor":"She borrowed the car, maxed out the card, and still somehow expected someone else to apologize. It seems the consequences are finally about to catch up with her."},{"name":"Substitute Teacher","persistent":{"name":"Classroom Control","effect":"School Implements deal -1 Impact."},"clothing":{"name":"Prim","effect":"Bent Over Disciplines deal -1 Impact."},"bare":{"name":"Already Sorry","effect":"Bare begins with -2 Composure."},"flavor":"She declared movie day before taking attendance and dismissed the class ten minutes early. Unfortunately, someone from administration was paying attention."},{"name":"Camp Counselor","persistent":{"name":"Outdoorsy","effect":"Short Implements deal -1 Impact."},"clothing":{"name":"Old School","effect":"School Implements deal -1 Impact."},"bare":{"name":"Off Balance","effect":"Bent Over Disciplines deal +1 Impact."},"flavor":"She stole the marshmallows, started a cabin prank war, and blamed the raccoons. Camp rules apply to counselors too."}];
 
@@ -812,12 +823,17 @@ function analyticsRead(key,fallback){
 function analyticsWrite(key,value){
   try{ localStorage.setItem(key,JSON.stringify(value)); return true; }catch(e){ return false; }
 }
-function analyticsStartGame(playerCount){
+function analyticsStartGame(playerCount,implementCount,nonImplementCount){
   return {
     schemaVersion:1,
     gameId:analyticsId(),
     startedAt:new Date().toISOString(),
     playerCount:Number(playerCount)||1,
+    supplySetup:{
+      implements:Number(implementCount)||0,
+      nonImplements:Number(nonImplementCount)||0,
+      total:(Number(implementCount)||0)+(Number(nonImplementCount)||0)
+    },
     result:null,
     totalTurns:null,
     bottoms:[],
@@ -975,7 +991,29 @@ function renderEndScreen(){
  return true;
 }
 
-function newGame(n){let chosenI=shuffle(IMPLEMENTS).slice(0,8).map(cp),chosenN=shuffle(NONIMPS).slice(0,12).map(cp);S={players:[],active:0,turn:1,punished:0,bottomDeck:shuffle(BOTTOMS.map(cp)),bottom:null,layers:[],position:null,location:null,supplyDeck:shuffle([...chosenI,...chosenN]),supply:[],broken:[],removed:[],ended:false,win:false,loss:false,finalTaken:false,taken:false,utility:1,discipline:3,pending:null,flags:{},log:[],composition:[...chosenI,...chosenN].map(x=>x.name),analytics:analyticsStartGame(n)};for(let i=0;i<n;i++){let p={name:`Player ${i+1}`,deck:shuffle(STARTING.map(cp)),discard:[],hand:[],acquired:[]};drawTo(p,4);S.players.push(p)}startEncounter();refillSupply();startTurn(true);analyticsSaveDraft();render()}
+function newGame(n,implementCount=8,nonImplementCount=12){
+ implementCount=Math.max(0,Math.min(IMPLEMENTS.length,Number(implementCount)||0));
+ nonImplementCount=Math.max(0,Math.min(NONIMPS.length,Number(nonImplementCount)||0));
+ let total=implementCount+nonImplementCount;
+ if(total<1)throw new Error('Supply Closet must contain at least 1 card.');
+ let chosenI=shuffle(IMPLEMENTS).slice(0,implementCount).map(cp);
+ let chosenN=shuffle(NONIMPS).slice(0,nonImplementCount).map(cp);
+ S={
+   players:[],active:0,turn:1,punished:0,
+   bottomDeck:shuffle(BOTTOMS.map(cp)),bottom:null,layers:[],position:null,location:null,
+   supplyDeck:shuffle([...chosenI,...chosenN]),supply:[],
+   supplyTotal:total,supplyConfig:{implements:implementCount,nonImplements:nonImplementCount},
+   broken:[],removed:[],ended:false,win:false,loss:false,finalTaken:false,taken:false,
+   utility:1,discipline:3,pending:null,flags:{},log:[],
+   composition:[...chosenI,...chosenN].map(x=>x.name),
+   analytics:analyticsStartGame(n,implementCount,nonImplementCount)
+ };
+ for(let i=0;i<n;i++){
+   let p={name:`Player ${i+1}`,deck:shuffle(STARTING.map(cp)),discard:[],hand:[],acquired:[]};
+   drawTo(p,4);S.players.push(p)
+ }
+ startEncounter();refillSupply();startTurn(true);analyticsSaveDraft();render()
+}
 
 function openPending(type,card,title,options,extra={}){S.pending={type,card,title,options,...extra};render()}
 function spendUtility(){if(!S.utility)return false;S.utility--;return true}
@@ -1010,8 +1048,25 @@ function resolvePending(i){let q=S.pending,o=q&&q.options[i];if(!o)return;
    return
  }
  else if(q.type==='followMe'){S.location=cp(o.location);log(`Follow Me changes the Location to ${S.location.name}.`);finishNonImplement(q.card)}
+ else if(q.type==='followThroughWindow'){
+   S.pending=null;
+   if(o.play){
+     let c=P().hand.splice(o.index,1)[0];
+     if(c){
+       P().discard.push(c);
+       log('Follow Through is played immediately for 0 Discipline Actions.');
+       applyImpact(3,'Follow Through');
+       S.flags.firstDiscipline=false;
+     }
+   }
+   render();return
+ }
  S.pending=null;render()}
 
+
+function qualifiesForReachBonus(ctx,reach){
+ return !!ctx&&(ctx.reach===reach||ctx.reach==='Flexible');
+}
 
 function persistentEffects(ctx,posBonus,otherPositive){
  let delta=0,positionBenefit=false,capAllBonus=false,blockPosBonus=false;
@@ -1037,23 +1092,23 @@ function layerEffects(ctx){
  if(t.name==='Old School'&&ctx.implement&&ctx.type==='School')d--;
  if(t.name==='Vulnerable'&&S.position==='OTK'){d++;b=true}
  if(t.name==='Off Balance'&&S.position==='Bent Over'){d++;b=true}
- if(t.name==='Tender'&&ctx.implement&&ctx.reach==='Short')d++;
- if(t.name==='Sensitive'&&ctx.implement&&ctx.reach==='Long')d++;
+ if(t.name==='Tender'&&ctx.implement&&qualifiesForReachBonus(ctx,'Short'))d++;
+ if(t.name==='Sensitive'&&ctx.implement&&qualifiesForReachBonus(ctx,'Long'))d++;
  if(t.name==='Right at Home'&&ctx.implement&&ctx.type==='Domestic')d++;
  if(t.name==='Smarting'&&ctx.implement&&ctx.type==='School')d++;
  return {delta:d,positionBenefit:b};
 }
 
-function locationDelta(ctx){if(!ctx.implement)return 0;let d=0;if(S.location.name==='Bedroom'&&ctx.type==='Domestic')d++;if(S.location.name==='Kitchen'&&ctx.reach==='Short')d++;if(S.location.name==='Woodshed'&&ctx.reach==='Long')d++;if(S.location.name==='Classroom'&&ctx.type==='School')d++;if(S.location.name==='Hotel Room')d--;return d}
+function locationDelta(ctx){if(!ctx.implement)return 0;let d=0;if(S.location.name==='Bedroom'&&ctx.type==='Domestic')d++;if(S.location.name==='Kitchen'&&qualifiesForReachBonus(ctx,'Short'))d++;if(S.location.name==='Woodshed'&&qualifiesForReachBonus(ctx,'Long'))d++;if(S.location.name==='Classroom'&&ctx.type==='School')d++;if(S.location.name==='Hotel Room')d--;return d}
 
 function computeImplement(c){
  let favored=(c.favored==='Either'&&!!S.position)||(c.favored===S.position);
- if(S.flags.grip==='shortBent'&&c.reach==='Short'&&S.position==='Bent Over')favored=true;
- if(S.flags.grip==='longOtk'&&c.reach==='Long'&&S.position==='OTK')favored=true;
+ if(S.flags.grip==='shortBent'&&qualifiesForReachBonus(c,'Short')&&S.position==='Bent Over')favored=true;
+ if(S.flags.grip==='longOtk'&&qualifiesForReachBonus(c,'Long')&&S.position==='OTK')favored=true;
  let posBonus=favored?c.positionBonus:0;if(S.flags.makeItCount&&posBonus)posBonus*=2;
  let otherPositive=0,negative=0;
  if(S.flags.settle)otherPositive++;
- if(S.flags.bendLong&&c.reach==='Long')otherPositive++;
+ if(S.flags.bendLong&&qualifiesForReachBonus(c,'Long'))otherPositive++;
  let ld=locationDelta(c);if(ld>0)otherPositive+=ld;else negative+=ld;
  let le=layerEffects({...c,dealsImpact:true});if(le.delta>0)otherPositive+=le.delta;else negative+=le.delta;
  let pe=persistentEffects({...c,dealsImpact:true},posBonus,otherPositive);
@@ -1135,6 +1190,7 @@ function playFromHand(i){
  if(S.pending||S.win||S.loss||S.ended)return;
  let c=P().hand[i];
  if(!c)return;
+ if(c.name==='Follow Through')return notice('Follow Through is played immediately after an Implement deals Impact.');
  let costsAction=usesDisciplineAction(c);
  if(costsAction&&S.discipline<1)return notice('No Discipline Actions remain.');
  save();
@@ -1143,6 +1199,22 @@ function playFromHand(i){
  else log(`${c.name} is played without using a Discipline Action.`);
  playResolved(c,!costsAction);
 }
+function offerFollowThrough(){
+ if(S.ended||S.pending)return false;
+ let index=P().hand.findIndex(x=>x.name==='Follow Through');
+ if(index<0)return false;
+ S.pending={
+   type:'followThroughWindow',
+   card:P().hand[index],
+   title:'Follow Through — play now?',
+   options:[
+     {label:'Play Follow Through',sub:'Costs 0 Discipline Actions and deals 3 additional Impact.',play:true,index:index},
+     {label:'Skip',sub:'Keep Follow Through in your hand.',play:false}
+   ]
+ };
+ return true;
+}
+
 function playResolved(c,free=false){
  if(free)log(`${c.name} is being played for 0 additional Discipline Actions.`);
  if(c.name==='Turn Around'||c.name==='Perfect Setup'){openPending('position',c,`${c.name} — choose Position`,[{label:'OTK',position:'OTK'},{label:'Bent Over',position:'Bent Over'}]);return}
@@ -1154,7 +1226,6 @@ function playResolved(c,free=false){
  if(c.name==='Built to Last')S.flags.built=true;
  if(c.name==='One More')S.flags.oneMore=true;
  if(c.name==='Not Finished Yet')S.flags.continueAfterBreak=true;
- if(c.name==='Follow Through')S.flags.followThrough=true;
  if(c.name==='Make It Count')S.flags.makeItCount=true;
  if(c.name==='Lasting Impression')S.flags.lasting=true;
  if(c.name==='Back to Basics')S.flags.backBasics=true;
@@ -1168,13 +1239,13 @@ function playResolved(c,free=false){
  if(c.implement){
    let r=computeImplement(c);didImpact=r.damage>0;applyImpact(r.damage,c.name);
    if(S.flags.oneMore&&!S.ended){S.flags.oneMore=false;applyImpact(r.damage,`${c.name} — One More`)}
-   if(S.flags.followThrough&&r.gotPositionBonus&&!S.ended){S.flags.followThrough=false;log('Follow Through adds 3 Impact without using an additional Discipline Action.');applyImpact(3,'Follow Through')}
    let protect=!!(S.flags.perfectPosition&&S.position===S.flags.perfectPosition&&r.favored);
    if(S.flags.lasting){P().deck.unshift(c);S.flags.lasting=false;log(`${c.name} goes on top of the deck unbroken.`)}
    else if(S.flags.built){P().discard.push(c);S.flags.built=false;log(`${c.name} does not Break and goes to discard.`)}
    else{S.broken.push(c);log(`${c.name} Breaks.`)}
    consumePosition(r.positionBenefit,protect);
-   S.flags.perfectPosition=null;S.flags.grip=null;S.flags.makeItCount=false;if(c.reach==='Long')S.flags.bendLong=false;
+   S.flags.perfectPosition=null;S.flags.grip=null;S.flags.makeItCount=false;if(qualifiesForReachBonus(c,'Long'))S.flags.bendLong=false;
+   if(!S.ended&&offerFollowThrough()){S.flags.firstDiscipline=false;render();return}
  } else {
    let r=computeBasic(c);if(r.damage>0){didImpact=true;applyImpact(r.damage,c.name)}
    if(c.name==='Find the Rhythm')drawOne(P());
@@ -1184,7 +1255,11 @@ function playResolved(c,free=false){
 }
 
 function takeSupply(i){if(S.taken)return notice('You already took your required Supply Closet card this turn.');let c=S.supply[i];if(!c)return;save();S.supply.splice(i,1);P().hand.push(c);P().acquired.push(c.name);S.taken=true;log(`${P().name} takes ${c.name} from the Supply Closet.`);if(S.supplyDeck.length+S.supply.length===0){S.finalTaken=true;log('The final Supply Closet card has been taken. This is the final turn unless Bottom 4 is Punished.')}render()}
-function endTurn(){if(S.pending)return notice('Finish resolving the current choice first.');if(!S.taken)return notice('You must take exactly 1 face-up Supply Closet card before ending the turn.');save();
+function endTurn(){
+ if(S.pending)return notice('Finish resolving the current choice first.');
+ if(!S.taken)return notice('You must take exactly 1 face-up Supply Closet card before ending the turn.');
+ if(S.utility)return notice('Use your required Utility Action before ending the turn.');
+ save();
  if(!S.ended){if(li()===0&&S.bottom.clothing.name==='Collected')recover(1,'Collected');if(S.location.name==='Beach House')recover(1,'Beach House')}
  let p=P();p.discard.push(...p.hand.splice(0));let handSize=S.punished>=2?5:4;if(S.location.name==='Office')handSize=Math.max(0,handSize-1);drawTo(p,handSize);
  ensureVictoryState();if(S.finalTaken&&!S.win){S.loss=true;analyticsFinalize('loss');log('Supply Closet exhausted before the fourth Bottom was Punished. Players lose.');render();return}
@@ -1259,7 +1334,7 @@ function render(){if(!S)return;ensureVictoryState();if(S.win||S.loss){renderEndS
  $('#layerTrait').textContent=traitText();$('#progressLabel').textContent=`Bottoms Punished ${S.punished}/4`;$('#clockLabel').textContent=`Supply remaining ${S.supplyDeck.length+S.supply.length}/20 · Broken ${S.broken.length}`;
  $('#locationName').textContent=S.location.name;$('#locationFlavor').textContent=S.location.flavor;$('#locationEffect').textContent=S.location.effect;
  $('#locationArt').innerHTML=hasArt(S.location.name)?artImg(S.location.name,'h-40 w-full rounded-lg object-cover'):`<div class="art-placeholder">Art placeholder</div>`;
- $('#positionLabel').textContent=`Position: ${S.position||'Unpositioned'}`;$('#utilityCount').textContent=`${S.utility} remaining`;$('#disciplineCount').textContent=`${S.discipline} remaining`;$('#utilityStatus').textContent=S.utility?'Available':'Spent';
+ $('#positionLabel').textContent=`Position: ${S.position||'Unpositioned'}`;$('#utilityCount').textContent=`${S.utility} remaining`;$('#disciplineCount').textContent=`${S.discipline} remaining`;$('#utilityStatus').textContent=S.utility?'Required':'Used';
  $('#hudTurn').textContent=`T${S.turn} · ${P().name.replace('Player ','P')}`;
  $('#hudBottom').textContent=S.bottom.name;
  let displayLayerIndex=currentLayerIndex<0?2:currentLayerIndex;
@@ -1272,6 +1347,7 @@ function render(){if(!S)return;ensureVictoryState();if(S.win||S.loss){renderEndS
  $('#hudSupply').className=`hudSupply ${S.taken?'done':'required'}`;
  $('#layers').innerHTML=['Clothing','Underwear','Bare'].map((x,i)=>`<div class="rounded-lg ${i===currentLayerIndex?'border-2 border-[var(--viz-accent)]':'border border-[var(--viz-border)]'} bg-[var(--viz-panel)] p-3"><div class="text-xs font-semibold text-[var(--viz-muted)]">${x}${i===currentLayerIndex?' · CURRENT':''}${currentLayerIndex<0&&i===2?' · PUNISHED':''}</div><div class="mt-1 text-xl font-semibold">${S.layers[i].current} / ${S.layers[i].start}</div></div>`).join('');
  $('#focusBtn').disabled=!S.utility;$('#refineBtn').disabled=!S.utility||!P().discard.length;$('#repairBtn').disabled=!S.utility||!S.broken.length;
+ $('#endTurnBtn').disabled=!!S.pending||!S.taken||!!S.utility;
  $('#supplyStatus').textContent=S.taken?'Required card taken ✓':'1 card still required';
  $('#supply').innerHTML=S.supply.length?S.supply.map((c,i)=>`<div class="supply-choice rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3">${cardVisual(c,false)}<button type="button" data-supply="${i}" ${S.taken?'disabled':''} class="supply-take mt-3 min-h-11 w-full rounded-lg border border-[var(--viz-border)] px-3 font-semibold disabled:opacity-40">Take into hand</button></div>`).join(''):'<div class="text-sm text-[var(--viz-muted)]">No face-up cards remain.</div>';
  $('#handTitle').textContent=`${P().name} hand · ${P().hand.length} cards`;$('#deckInfo').textContent=`Deck ${P().deck.length} · discard ${P().discard.length} · removed ${S.removed.length}`;
@@ -1293,7 +1369,28 @@ function render(){if(!S)return;ensureVictoryState();if(S.win||S.loss){renderEndS
 
 root.addEventListener('click',e=>{let b=e.target.closest('button');if(!b)return;if(b.dataset.card!==undefined)playFromHand(Number(b.dataset.card));else if(b.dataset.supply!==undefined)takeSupply(Number(b.dataset.supply));else if(b.dataset.choice!==undefined)resolvePending(Number(b.dataset.choice));else if(b.dataset.cancelUtility!==undefined)cancelUtilityPending()});
 $('#focusBtn').addEventListener('click',focus);$('#refineBtn').addEventListener('click',refine);$('#repairBtn').addEventListener('click',repair);
-$('#setupForm').addEventListener('submit',e=>{e.preventDefault();try{newGame(Math.max(1,Math.min(4,Number($('#playerCount').value)||1)))}catch(err){console.error(err);const n=$('#notice');if(n){n.textContent='Could not start game: '+(err&&err.message?err.message:String(err));n.classList.remove('hidden');}else{alert('Could not start game: '+(err&&err.message?err.message:String(err)));}}});
+function updateSupplySetupTotal(){
+ let a=Number($('#supplyImplementCount').value)||0,b=Number($('#supplyNonImplementCount').value)||0;
+ $('#supplySetupTotal').textContent=a+b;
+}
+$('#supplyImplementCount').addEventListener('change',updateSupplySetupTotal);
+$('#supplyNonImplementCount').addEventListener('change',updateSupplySetupTotal);
+updateSupplySetupTotal();
+$('#setupForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ try{
+   newGame(
+     Math.max(1,Math.min(4,Number($('#playerCount').value)||1)),
+     Number($('#supplyImplementCount').value)||0,
+     Number($('#supplyNonImplementCount').value)||0
+   )
+ }catch(err){
+   console.error(err);
+   const n=$('#notice');
+   if(n){n.textContent='Could not start game: '+(err&&err.message?err.message:String(err));n.classList.remove('hidden');}
+   else{alert('Could not start game: '+(err&&err.message?err.message:String(err)))}
+ }
+});
 $('#endTurnBtn').addEventListener('click',endTurn);$('#undoBtn').addEventListener('click',()=>{if(!H.length)return notice('Nothing to undo.');S=H.pop();render()});
 $('#restartBtn').addEventListener('click',()=>{S=null;H=[];showIntro()});
 $('#minusBtn').addEventListener('click',()=>{if(!S||S.ended)return;save();applyImpact(1,'Manual adjustment');render()});
@@ -1305,7 +1402,12 @@ $('#gameRulesBtn').addEventListener('click',openRules);
 $('#endRulesBtn').addEventListener('click',openRules);
 $('#closeRulesBtn').addEventListener('click',closeRules);
 $('#rulesModal').addEventListener('click',e=>{if(e.target.closest('[data-close-rules]'))closeRules()});
-$('#playAgainBtn').addEventListener('click',()=>{let n=(S&&S.players&&S.players.length)||Number($('#playerCount').value)||1;newGame(n);window.scrollTo(0,0)});
+$('#playAgainBtn').addEventListener('click',()=>{
+ let n=(S&&S.players&&S.players.length)||Number($('#playerCount').value)||1;
+ let ic=(S&&S.supplyConfig?S.supplyConfig.implements:Number($('#supplyImplementCount').value)||8);
+ let nc=(S&&S.supplyConfig?S.supplyConfig.nonImplements:Number($('#supplyNonImplementCount').value)||12);
+ newGame(n,ic,nc);window.scrollTo(0,0)
+});
 $('#changePlayersBtn').addEventListener('click',showIntro);
 
 })();
@@ -1362,7 +1464,7 @@ async function uploadRecord(record, user, status) {
   const cleanRecord = JSON.parse(JSON.stringify(record));
   cleanRecord.ownerUid = user.uid;
   cleanRecord.status = status;
-  cleanRecord.siteVersion = "rules-1.41-cardset-1.41";
+  cleanRecord.siteVersion = "rules-1.42-cardset-1.42";
   cleanRecord.lastSyncedAt = serverTimestamp();
 
   await setDoc(
