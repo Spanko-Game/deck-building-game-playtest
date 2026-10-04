@@ -628,7 +628,6 @@ body.overlay-open{overflow:hidden}
 /* Reworked bottom encounter area: give the Bottom art much more presence on desktop. */
 .encounter-body{display:block}
 .encounter-art{margin:0 0 10px}
-.encounter-art .art-placeholder,
 .encounter-art img{display:block;width:100%;border-radius:.75rem}
 
 @media(min-width:640px){
@@ -687,8 +686,7 @@ body.overlay-open{overflow:hidden}
     max-width:none!important;
     margin:0!important;
   }
-  #bottomArt.encounter-art img,
-  #bottomArt.encounter-art .art-placeholder{
+  #bottomArt.encounter-art img{
     display:block!important;
     width:100%!important;
     height:auto!important;
@@ -703,6 +701,57 @@ body.overlay-open{overflow:hidden}
 @media(min-width:1300px){
   .encounter-body{
     grid-template-columns:minmax(430px,44%) minmax(0,1fr)!important;
+  }
+}
+
+
+/* Bottom panel: large artwork on top, details below. */
+@media(min-width:700px){
+  .encounter-body{
+    display:block!important;
+  }
+
+  #bottomArt.encounter-art{
+    display:block!important;
+    width:100%!important;
+    max-width:none!important;
+    margin:0 0 1rem!important;
+  }
+
+  #bottomArt.encounter-art img{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    max-height:460px!important;
+    aspect-ratio:3/2!important;
+    object-fit:cover!important;
+    object-position:center!important;
+    border-radius:.85rem!important;
+  }
+
+  /* Do not force the fallback placeholder visible when the real image loaded. */
+  #bottomArt.encounter-art .art-placeholder{
+    width:100%!important;
+    min-height:280px!important;
+    aspect-ratio:3/2!important;
+    align-items:center!important;
+    justify-content:center!important;
+    border-radius:.85rem!important;
+  }
+
+  .encounter-copy{
+    display:block!important;
+    width:100%!important;
+  }
+
+  .encounter-copy #layers{
+    margin-top:1rem!important;
+  }
+}
+
+@media(min-width:1300px){
+  #bottomArt.encounter-art img{
+    max-height:520px!important;
   }
 }
 
@@ -980,7 +1029,7 @@ body.overlay-open{overflow:hidden}
 
 <script>
 (()=>{
-/* DUE FOR A SPANKING BUILD: 1.42 UX5 / DESKTOP BOTTOM ART LARGE */
+/* DUE FOR A SPANKING BUILD: 1.42 UX6 / BOTTOM ART ABOVE DETAILS */
 const root=document.getElementById('dbg12-art'); if(root.dataset.ready)return; root.dataset.ready='1';
 const $=s=>root.querySelector(s), cp=o=>{ if (typeof structuredClone==='function') return structuredClone(o); return JSON.parse(JSON.stringify(o)); };
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
