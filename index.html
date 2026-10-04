@@ -983,7 +983,7 @@ body.overlay-open{overflow:hidden}
 
 <script>
 (()=>{
-/* DUE FOR A SPANKING BUILD: 1.42 UX8 / DESKTOP HERO ART SEPARATE FROM MOBILE */
+/* DUE FOR A SPANKING BUILD: 1.42 UX9 / ROBUST LAYER ART FALLBACK */
 const root=document.getElementById('dbg12-art'); if(root.dataset.ready)return; root.dataset.ready='1';
 const $=s=>root.querySelector(s), cp=o=>{ if (typeof structuredClone==='function') return structuredClone(o); return JSON.parse(JSON.stringify(o)); };
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -1004,7 +1004,7 @@ const bottomArtImg=(n,layerIndex,cls='w-full rounded-lg object-cover')=>{
  if(!isBottomArtKey(n)||layerIndex===0)
    return `<img src="${base}" alt="${esc(n)} artwork" class="${cls}" onerror="this.onerror=null;this.style.display='none'">`;
  let staged=bottomArtStageUrl(n,layerIndex);
- return `<img src="${staged}" alt="${esc(n)} artwork" class="${cls}" onerror="if(this.src!==new URL('${base}',document.baseURI).href){this.src='${base}';this.onerror=function(){this.style.display='none'}}else{this.style.display='none'}">`;
+ return `<img src="${staged}" alt="${esc(n)} artwork" class="${cls}" data-base-art="${base}" onerror="if(this.dataset.fallbackTried==='1'){this.onerror=null;this.style.display='none';}else{this.dataset.fallbackTried='1';this.src=this.dataset.baseArt;}">`;
 };
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
@@ -1584,7 +1584,8 @@ function render(){if(!S)return;ensureVictoryState();if(S.win||S.loss){renderEndS
  $('#turnLabel').textContent=`Turn ${S.turn} · ${P().name}`;$('#bottomName').textContent=S.bottom.name;$('#bottomFlavor').textContent=S.bottom.flavor;
  let bottomLayerForArt=currentLayerIndex<0?2:currentLayerIndex;
  let bottomMarkup=hasArt(S.bottom.name)?bottomArtImg(S.bottom.name,bottomLayerForArt,'w-full rounded-lg object-cover'):'';
- $('#bottomArt').innerHTML=bottomMarkup;
+ let mobileBottomArt=$('#bottomArt');
+ if(mobileBottomArt)mobileBottomArt.innerHTML=bottomMarkup;
  let desktopHero=$('#desktopBottomHero');
  if(desktopHero)desktopHero.innerHTML=bottomMarkup;
  $('#persistentTrait').textContent=`Evergreen Trait — ${S.bottom.persistent.name}: ${S.bottom.persistent.effect}${persistentIgnored()?' (ignored for this Layer)':''}`;
