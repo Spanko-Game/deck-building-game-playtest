@@ -531,6 +531,74 @@ body.overlay-open{overflow:hidden}
 .full-rules-details summary{font-size:1rem!important;color:var(--viz-text)}
 .full-rules-pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:.8rem 0 0;font:inherit;font-size:.78rem;line-height:1.48;color:var(--viz-muted)}
 
+
+/* Desktop encounter presentation */
+@media(min-width:640px){
+  #game>section:first-of-type>div:first-child{
+    grid-template-columns:minmax(230px,270px) minmax(0,1fr)!important;
+  }
+  #bottomArt img{
+    width:100%!important;
+    height:auto!important;
+    aspect-ratio:3/2!important;
+    object-fit:cover!important;
+    object-position:center!important;
+  }
+}
+@media(min-width:1200px){
+  #game>section:first-of-type>div:first-child{
+    grid-template-columns:minmax(270px,310px) minmax(0,1fr)!important;
+  }
+}
+
+/* Sticky status bar on desktop too, not only phones. */
+#mobileHud{
+  display:block!important;
+  position:-webkit-sticky!important;
+  position:sticky!important;
+  top:0!important;
+  z-index:70!important;
+  background:rgba(255,250,242,.97)!important;
+  border:1px solid var(--viz-border)!important;
+  border-radius:.8rem!important;
+  padding:.55rem .65rem!important;
+  box-shadow:0 8px 22px rgba(62,38,28,.14)!important;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+.hudTop{display:flex;justify-content:space-between;gap:.5rem;align-items:center;min-width:0}
+.hudIdentity{display:flex;gap:.4rem;align-items:baseline;min-width:0;white-space:nowrap}
+#hudTurn{font-size:.72rem;color:var(--viz-muted);font-weight:700}
+#hudBottom{font-size:.9rem;overflow:hidden;text-overflow:ellipsis}
+.hudSupply{font-size:.7rem;font-weight:800;white-space:nowrap;padding:.2rem .42rem;border-radius:999px;background:var(--viz-panel)}
+.hudSupply.required{background:#f6dfdc;color:#7d3038}
+.hudSupply.done{background:#e5efe5;color:#365d42}
+.hudState{display:grid;grid-template-columns:1.35fr 1.15fr .7fr .7fr;gap:.3rem;margin-top:.45rem}
+.hudState span{
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  background:var(--viz-panel);border-radius:.48rem;padding:.32rem .38rem;
+  font-size:.7rem;font-weight:750;text-align:center
+}
+
+/* Keep End Turn sticky on desktop as well as mobile. */
+#endTurnBtn{
+  position:sticky!important;
+  bottom:10px!important;
+  z-index:45!important;
+  box-shadow:0 8px 25px rgba(0,0,0,.18)!important;
+}
+
+/* Jump-target feedback when End Turn is blocked. */
+.turn-blocker-highlight{
+  outline:3px solid rgba(143,61,72,.55)!important;
+  outline-offset:3px;
+  animation:turnBlockerPulse .7s ease 2;
+}
+@keyframes turnBlockerPulse{
+  0%,100%{box-shadow:var(--shadow)}
+  50%{box-shadow:0 0 0 6px rgba(143,61,72,.13),var(--shadow)}
+}
+
 </style></head><body>
 <div id="dbg12-art" class="w-full space-y-4 text-[var(--viz-text)]">
   <div id="setup" class="intro-screen">
@@ -551,6 +619,17 @@ body.overlay-open{overflow:hidden}
           <option value="1">1 player</option><option value="2">2 players</option><option value="3">3 players</option><option value="4">4 players</option>
         </select>
       </label>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <label class="intro-label">Supply Implements
+          <select id="supplyImplementCount" class="intro-select"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8" selected>8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option></select>
+        </label>
+        <label class="intro-label">Other Supply cards
+          <select id="supplyNonImplementCount" class="intro-select"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12" selected>12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option></select>
+        </label>
+      </div>
+      <div class="rounded-lg border border-[var(--viz-border)] bg-[var(--viz-panel)] px-3 py-2 text-sm">
+        Supply Closet total: <strong id="supplySetupTotal">20</strong> cards
+      </div>
       <button type="submit" class="intro-primary">Start randomized game</button>
       <button id="introRulesBtn" type="button" class="intro-secondary">How to Play</button>
     </form>
@@ -613,9 +692,9 @@ body.overlay-open{overflow:hidden}
       </div>
     </section>
 
-    <section class="rounded-xl border border-[var(--viz-border)] bg-[var(--viz-card)] p-4">
+    <section id="utilitySection" class="rounded-xl border border-[var(--viz-border)] bg-[var(--viz-card)] p-4">
       <div class="flex flex-wrap items-start justify-between gap-2">
-        <div><div class="font-semibold">Utility Action</div><div class="mt-1 text-sm text-[var(--viz-muted)]">Use up to one per turn: Focus, Refine, or Repair. Position is changed only by card/effect text.</div></div>
+        <div><div class="font-semibold">Utility Action</div><div class="mt-1 text-sm text-[var(--viz-muted)]">Required in this playtest app: use exactly one per turn — Focus, Refine, or Repair. Position is changed only by card/effect text.</div></div>
         <div id="utilityStatus" class="text-sm font-semibold"></div>
       </div>
       <div class="mt-4 grid gap-2 sm:grid-cols-3">
@@ -627,7 +706,7 @@ body.overlay-open{overflow:hidden}
 
     <div id="notice" class="hidden rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3 text-sm" aria-live="polite"></div>
 
-    <section class="rounded-xl border border-[var(--viz-border)] bg-[var(--viz-card)] p-4">
+    <section id="supplySection" class="rounded-xl border border-[var(--viz-border)] bg-[var(--viz-card)] p-4">
       <div class="flex flex-wrap justify-between gap-2">
         <div><div class="font-semibold">Supply Closet</div><div class="text-sm text-[var(--viz-muted)]">Take exactly 1 face-up card during your turn. The empty slot refills next turn.</div></div>
         <div id="supplyStatus" class="text-sm font-semibold"></div>
@@ -635,7 +714,7 @@ body.overlay-open{overflow:hidden}
       <div id="supply" class="mt-3 grid gap-2 md:grid-cols-3"></div>
     </section>
 
-    <section class="rounded-xl border border-[var(--viz-border)] bg-[var(--viz-card)] p-4">
+    <section id="disciplineSection" class="rounded-xl border border-[var(--viz-border)] bg-[var(--viz-card)] p-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div><div id="handTitle" class="font-semibold"></div><div id="deckInfo" class="text-sm text-[var(--viz-muted)]"></div></div>
         <div class="flex flex-wrap gap-2"><button id="gameRulesBtn" type="button" class="min-h-11 rounded-lg border border-[var(--viz-border)] px-3">Rules</button><button id="undoBtn" type="button" class="min-h-11 rounded-lg border border-[var(--viz-border)] px-3">Undo</button><button id="endTurnBtn" type="button" class="min-h-11 rounded-lg bg-[var(--viz-accent-bg)] px-4 font-semibold">End turn</button></div>
@@ -1267,6 +1346,41 @@ These records should be treated as playtest observations, not automatic balance 
 
 These requirements are for digital playtest implementations and do not change tabletop gameplay.
 
+
+### Required Utility Action in the Playtest App
+
+This is a **digital playtest-app requirement only**. It does not change the tabletop rule that a player may choose whether to use their Utility Action.
+
+In the playtest app:
+
+- The active player must use **exactly 1 Utility Action** before ending their turn.
+- The **End Turn** control must remain unavailable while the Utility Action is unused.
+- The Utility Action area should be visibly marked **Required** until the player uses **Focus**, **Refine**, or **Repair**.
+- Once a Utility Action has been used, the requirement is satisfied for that turn and the app should not allow a second Utility Action unless a specific effect explicitly grants one.
+- This enforcement exists to prevent accidental skipping during digital playtesting and should not be interpreted as a change to the physical-game rules.
+
+
+### Configurable Supply Closet Composition in the Playtest App
+
+This is a **digital playtest-app requirement only**. It does not change the default tabletop setup unless a later rules version explicitly does so.
+
+At game setup, the playtest app must allow the user to choose:
+
+- the number of **Implements** in the Supply Closet
+- the number of **non-Implement Discipline Cards** in the Supply Closet
+
+The app should automatically show the resulting **total Supply Closet size**.
+
+Default values remain:
+
+- **8 Implements**
+- **12 non-Implement Discipline Cards**
+- **20 total Supply Closet cards**
+
+The app must build the Supply Closet by randomly selecting the chosen number of Implements and non-Implement Discipline Cards from the current spreadsheet pools, then shuffle them together.
+
+The selected Implement count, non-Implement count, and total Supply Closet size should be recorded in the playtest results so different configurations can be compared across games.
+
 ### Spreadsheet-Driven Content
 
 The current spreadsheet is the source of truth for all game content.
@@ -1328,7 +1442,7 @@ Do not substitute an older hard-coded card list, Bottom roster, Trait list, flav
 
 <script>
 (()=>{
-/* DUE FOR A SPANKING BUILD: 1.42 / FULL RULES EMBEDDED / LAYERED ART */
+/* DUE FOR A SPANKING BUILD: 1.42 UX2 / DESKTOP STICKY HUD / GUIDED END TURN / LATEST FULL RULES */
 const root=document.getElementById('dbg12-art'); if(root.dataset.ready)return; root.dataset.ready='1';
 const $=s=>root.querySelector(s), cp=o=>{ if (typeof structuredClone==='function') return structuredClone(o); return JSON.parse(JSON.stringify(o)); };
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -1394,13 +1508,17 @@ function analyticsRead(key,fallback){
 function analyticsWrite(key,value){
   try{ localStorage.setItem(key,JSON.stringify(value)); return true; }catch(e){ return false; }
 }
-function analyticsStartGame(playerCount){
+function analyticsStartGame(playerCount,implementCount,nonImplementCount){
   return {
     schemaVersion:1,
     gameId:analyticsId(),
     startedAt:new Date().toISOString(),
     playerCount:Number(playerCount)||1,
-    supplySetup:{implements:8,nonImplements:12,total:20},
+    supplySetup:{
+      implements:Number(implementCount)||0,
+      nonImplements:Number(nonImplementCount)||0,
+      total:(Number(implementCount)||0)+(Number(nonImplementCount)||0)
+    },
     result:null,
     totalTurns:null,
     bottoms:[],
@@ -1558,18 +1676,22 @@ function renderEndScreen(){
  return true;
 }
 
-function newGame(n){
- let chosenI=shuffle(IMPLEMENTS).slice(0,8).map(cp);
- let chosenN=shuffle(NONIMPS).slice(0,12).map(cp);
+function newGame(n,implementCount=8,nonImplementCount=12){
+ implementCount=Math.max(0,Math.min(IMPLEMENTS.length,Number(implementCount)||0));
+ nonImplementCount=Math.max(0,Math.min(NONIMPS.length,Number(nonImplementCount)||0));
+ let total=implementCount+nonImplementCount;
+ if(total<1)throw new Error('Supply Closet must contain at least 1 card.');
+ let chosenI=shuffle(IMPLEMENTS).slice(0,implementCount).map(cp);
+ let chosenN=shuffle(NONIMPS).slice(0,nonImplementCount).map(cp);
  S={
    players:[],active:0,turn:1,punished:0,
    bottomDeck:shuffle(BOTTOMS.map(cp)),bottom:null,layers:[],position:null,location:null,
    supplyDeck:shuffle([...chosenI,...chosenN]),supply:[],
-   supplyTotal:20,supplyConfig:{implements:8,nonImplements:12},
+   supplyTotal:total,supplyConfig:{implements:implementCount,nonImplements:nonImplementCount},
    broken:[],removed:[],ended:false,win:false,loss:false,finalTaken:false,taken:false,
    utility:1,discipline:3,pending:null,flags:{},log:[],
    composition:[...chosenI,...chosenN].map(x=>x.name),
-   analytics:analyticsStartGame(n)
+   analytics:analyticsStartGame(n,implementCount,nonImplementCount)
  };
  for(let i=0;i<n;i++){
    let p={name:`Player ${i+1}`,deck:shuffle(STARTING.map(cp)),discard:[],hand:[],acquired:[]};
@@ -1817,14 +1939,43 @@ function playResolved(c,free=false){
 }
 
 function takeSupply(i){if(S.taken)return notice('You already took your required Supply Closet card this turn.');let c=S.supply[i];if(!c)return;save();S.supply.splice(i,1);P().hand.push(c);P().acquired.push(c.name);S.taken=true;log(`${P().name} takes ${c.name} from the Supply Closet.`);if(S.supplyDeck.length+S.supply.length===0){S.finalTaken=true;log('The final Supply Closet card has been taken. This is the final turn unless Bottom 4 is Punished.')}render()}
+function jumpToTurnRequirement(id,message){
+ notice(message);
+ let el=document.getElementById(id);
+ if(!el)return;
+ el.classList.remove('turn-blocker-highlight');
+ void el.offsetWidth;
+ el.classList.add('turn-blocker-highlight');
+ el.scrollIntoView({behavior:'smooth',block:'center'});
+ setTimeout(()=>el.classList.remove('turn-blocker-highlight'),1800);
+}
+
 function endTurn(){
- if(S.pending)return notice('Finish resolving the current choice first.');
- if(!S.taken)return notice('You must take exactly 1 face-up Supply Closet card before ending the turn.');
+ if(S.pending){
+   if(isUtilityPending(S.pending)){
+     jumpToTurnRequirement('utilitySection','Finish the Utility Action choice before ending the turn.');
+   }else{
+     jumpToTurnRequirement('disciplineSection','Finish resolving the current Discipline card before ending the turn.');
+   }
+   return;
+ }
+ if(!S.taken){
+   jumpToTurnRequirement('supplySection','Take exactly 1 face-up Supply Closet card before ending the turn.');
+   return;
+ }
+ if(S.utility){
+   jumpToTurnRequirement('utilitySection','Use your required Utility Action before ending the turn.');
+   return;
+ }
  save();
  if(!S.ended){if(li()===0&&S.bottom.clothing.name==='Collected')recover(1,'Collected');if(S.location.name==='Beach House')recover(1,'Beach House')}
  let p=P();p.discard.push(...p.hand.splice(0));let handSize=S.punished>=2?5:4;if(S.location.name==='Office')handSize=Math.max(0,handSize-1);drawTo(p,handSize);
  ensureVictoryState();if(S.finalTaken&&!S.win){S.loss=true;analyticsFinalize('loss');log('Supply Closet exhausted before the fourth Bottom was Punished. Players lose.');render();return}
  S.active=(S.active+1)%S.players.length;S.turn++;startTurn(false);render()
+
+ if(!S.win&&!S.loss){
+   requestAnimationFrame(()=>window.scrollTo({top:0,behavior:'smooth'}));
+ }
 }
 
 function cardVisual(c,button=false,index=0,zone='card'){
@@ -1892,10 +2043,10 @@ function render(){if(!S)return;ensureVictoryState();if(S.win||S.loss){renderEndS
  let bottomLayerForArt=currentLayerIndex<0?2:currentLayerIndex;
  $('#bottomArt').innerHTML=hasArt(S.bottom.name)?bottomArtImg(S.bottom.name,bottomLayerForArt,'w-full rounded-lg object-cover'):`<div class="art-placeholder">Art placeholder</div>`;
  $('#persistentTrait').textContent=`Evergreen Trait — ${S.bottom.persistent.name}: ${S.bottom.persistent.effect}${persistentIgnored()?' (ignored for this Layer)':''}`;
- $('#layerTrait').textContent=traitText();$('#progressLabel').textContent=`Bottoms Punished ${S.punished}/4`;$('#clockLabel').textContent=`Supply remaining ${S.supplyDeck.length+S.supply.length}/20 · Broken ${S.broken.length}`;
+ $('#layerTrait').textContent=traitText();$('#progressLabel').textContent=`Bottoms Punished ${S.punished}/4`;$('#clockLabel').textContent=`Supply remaining ${S.supplyDeck.length+S.supply.length}/${S.supplyTotal||20} · Broken ${S.broken.length}`;
  $('#locationName').textContent=S.location.name;$('#locationFlavor').textContent=S.location.flavor;$('#locationEffect').textContent=S.location.effect;
  $('#locationArt').innerHTML=hasArt(S.location.name)?artImg(S.location.name,'h-40 w-full rounded-lg object-cover'):`<div class="art-placeholder">Art placeholder</div>`;
- $('#positionLabel').textContent=`Position: ${S.position||'Unpositioned'}`;$('#utilityCount').textContent=`${S.utility} remaining`;$('#disciplineCount').textContent=`${S.discipline} remaining`;$('#utilityStatus').textContent=S.utility?'Available':'Spent';
+ $('#positionLabel').textContent=`Position: ${S.position||'Unpositioned'}`;$('#utilityCount').textContent=`${S.utility} remaining`;$('#disciplineCount').textContent=`${S.discipline} remaining`;$('#utilityStatus').textContent=S.utility?'Required':'Used';
  $('#hudTurn').textContent=`T${S.turn} · ${P().name.replace('Player ','P')}`;
  $('#hudBottom').textContent=S.bottom.name;
  let displayLayerIndex=currentLayerIndex<0?2:currentLayerIndex;
@@ -1908,7 +2059,7 @@ function render(){if(!S)return;ensureVictoryState();if(S.win||S.loss){renderEndS
  $('#hudSupply').className=`hudSupply ${S.taken?'done':'required'}`;
  $('#layers').innerHTML=['Clothing','Underwear','Bare'].map((x,i)=>`<div class="rounded-lg ${i===currentLayerIndex?'border-2 border-[var(--viz-accent)]':'border border-[var(--viz-border)]'} bg-[var(--viz-panel)] p-3"><div class="text-xs font-semibold text-[var(--viz-muted)]">${x}${i===currentLayerIndex?' · CURRENT':''}${currentLayerIndex<0&&i===2?' · PUNISHED':''}</div><div class="mt-1 text-xl font-semibold">${S.layers[i].current} / ${S.layers[i].start}</div></div>`).join('');
  $('#focusBtn').disabled=!S.utility;$('#refineBtn').disabled=!S.utility||!P().discard.length;$('#repairBtn').disabled=!S.utility||!S.broken.length;
- $('#endTurnBtn').disabled=!!S.pending||!S.taken;
+ $('#endTurnBtn').disabled=false;
  $('#supplyStatus').textContent=S.taken?'Required card taken ✓':'1 card still required';
  $('#supply').innerHTML=S.supply.length?S.supply.map((c,i)=>`<div class="supply-choice rounded-xl border border-[var(--viz-border)] bg-[var(--viz-panel)] p-3">${cardVisual(c,false)}<button type="button" data-supply="${i}" ${S.taken?'disabled':''} class="supply-take mt-3 min-h-11 w-full rounded-lg border border-[var(--viz-border)] px-3 font-semibold disabled:opacity-40">Take into hand</button></div>`).join(''):'<div class="text-sm text-[var(--viz-muted)]">No face-up cards remain.</div>';
  $('#handTitle').textContent=`${P().name} hand · ${P().hand.length} cards`;$('#deckInfo').textContent=`Deck ${P().deck.length} · discard ${P().discard.length} · removed ${S.removed.length}`;
@@ -1930,10 +2081,23 @@ function render(){if(!S)return;ensureVictoryState();if(S.win||S.loss){renderEndS
 
 root.addEventListener('click',e=>{let b=e.target.closest('button');if(!b)return;if(b.dataset.card!==undefined)playFromHand(Number(b.dataset.card));else if(b.dataset.supply!==undefined)takeSupply(Number(b.dataset.supply));else if(b.dataset.choice!==undefined)resolvePending(Number(b.dataset.choice));else if(b.dataset.cancelUtility!==undefined)cancelUtilityPending()});
 $('#focusBtn').addEventListener('click',focus);$('#refineBtn').addEventListener('click',refine);$('#repairBtn').addEventListener('click',repair);
+function updateSupplySetupTotal(){
+ let a=Number($('#supplyImplementCount').value)||0;
+ let b=Number($('#supplyNonImplementCount').value)||0;
+ $('#supplySetupTotal').textContent=a+b;
+}
+$('#supplyImplementCount').addEventListener('change',updateSupplySetupTotal);
+$('#supplyNonImplementCount').addEventListener('change',updateSupplySetupTotal);
+updateSupplySetupTotal();
 $('#setupForm').addEventListener('submit',e=>{
  e.preventDefault();
- try{newGame(Math.max(1,Math.min(4,Number($('#playerCount').value)||1)))}
- catch(err){
+ try{
+   newGame(
+     Math.max(1,Math.min(4,Number($('#playerCount').value)||1)),
+     Number($('#supplyImplementCount').value)||0,
+     Number($('#supplyNonImplementCount').value)||0
+   )
+ }catch(err){
    console.error(err);
    const n=$('#notice');
    if(n){n.textContent='Could not start game: '+(err&&err.message?err.message:String(err));n.classList.remove('hidden');}
@@ -1951,7 +2115,12 @@ $('#gameRulesBtn').addEventListener('click',openRules);
 $('#endRulesBtn').addEventListener('click',openRules);
 $('#closeRulesBtn').addEventListener('click',closeRules);
 $('#rulesModal').addEventListener('click',e=>{if(e.target.closest('[data-close-rules]'))closeRules()});
-$('#playAgainBtn').addEventListener('click',()=>{let n=(S&&S.players&&S.players.length)||Number($('#playerCount').value)||1;newGame(n);window.scrollTo(0,0)});
+$('#playAgainBtn').addEventListener('click',()=>{
+ let n=(S&&S.players&&S.players.length)||Number($('#playerCount').value)||1;
+ let ic=(S&&S.supplyConfig?S.supplyConfig.implements:Number($('#supplyImplementCount').value)||8);
+ let nc=(S&&S.supplyConfig?S.supplyConfig.nonImplements:Number($('#supplyNonImplementCount').value)||12);
+ newGame(n,ic,nc);window.scrollTo(0,0)
+});
 $('#changePlayersBtn').addEventListener('click',showIntro);
 
 })();
