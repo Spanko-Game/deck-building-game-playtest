@@ -656,6 +656,58 @@ body.overlay-open{overflow:hidden}
   }
 }
 
+
+/* UX8: desktop-only Bottom hero. iPhone/mobile layout is untouched. */
+.desktop-bottom-hero{display:none}
+
+@media(min-width:800px){
+  .desktop-bottom-hero{
+    display:block!important;
+    width:100%!important;
+    margin:0 0 1rem!important;
+  }
+  .desktop-bottom-hero img{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    max-height:560px!important;
+    aspect-ratio:3/2!important;
+    object-fit:cover!important;
+    object-position:center!important;
+    border-radius:.9rem!important;
+  }
+
+  /* The old art container is mobile-only on desktop now. */
+  #bottomArt{display:none!important}
+
+  /* No leftover placeholder can ever show in the Bottom panel on desktop. */
+  #desktopBottomHero .art-placeholder,
+  #bottomArt .art-placeholder{
+    display:none!important;
+  }
+
+  /* Text/details get the full panel width under the hero image. */
+  .encounter-body{
+    display:block!important;
+    width:100%!important;
+  }
+  .encounter-copy{
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+  .encounter-copy #layers{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    margin-top:1rem!important;
+  }
+}
+
+@media(min-width:1400px){
+  .desktop-bottom-hero img{
+    max-height:620px!important;
+  }
+}
+
 </style></head><body>
 <div id="dbg12-art" class="w-full space-y-4 text-[var(--viz-text)]">
   <div id="setup" class="intro-screen">
@@ -714,7 +766,8 @@ body.overlay-open{overflow:hidden}
     </div>
     <section class="grid gap-3 md:grid-cols-3">
       <div class="rounded-xl border border-[var(--viz-border)] bg-[var(--viz-card)] p-4 md:col-span-2">
-        <div class="encounter-body" style="display:block !important;">
+        <div id="desktopBottomHero" class="desktop-bottom-hero"></div>
+        <div class="encounter-body">
           <div id="bottomArt" class="encounter-art"></div>
           <div class="encounter-copy min-w-0">
             <div class="flex flex-wrap justify-between gap-3">
@@ -930,7 +983,7 @@ body.overlay-open{overflow:hidden}
 
 <script>
 (()=>{
-/* DUE FOR A SPANKING BUILD: 1.42 UX7 / CLEAN BOTTOM STACK / NO BOTTOM PLACEHOLDER */
+/* DUE FOR A SPANKING BUILD: 1.42 UX8 / DESKTOP HERO ART SEPARATE FROM MOBILE */
 const root=document.getElementById('dbg12-art'); if(root.dataset.ready)return; root.dataset.ready='1';
 const $=s=>root.querySelector(s), cp=o=>{ if (typeof structuredClone==='function') return structuredClone(o); return JSON.parse(JSON.stringify(o)); };
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -1530,7 +1583,10 @@ function render(){if(!S)return;ensureVictoryState();if(S.win||S.loss){renderEndS
  var currentLayerIndex=li();
  $('#turnLabel').textContent=`Turn ${S.turn} · ${P().name}`;$('#bottomName').textContent=S.bottom.name;$('#bottomFlavor').textContent=S.bottom.flavor;
  let bottomLayerForArt=currentLayerIndex<0?2:currentLayerIndex;
- $('#bottomArt').innerHTML=hasArt(S.bottom.name)?bottomArtImg(S.bottom.name,bottomLayerForArt,'w-full rounded-lg object-cover'):`<div class="art-placeholder">Art placeholder</div>`;
+ let bottomMarkup=hasArt(S.bottom.name)?bottomArtImg(S.bottom.name,bottomLayerForArt,'w-full rounded-lg object-cover'):'';
+ $('#bottomArt').innerHTML=bottomMarkup;
+ let desktopHero=$('#desktopBottomHero');
+ if(desktopHero)desktopHero.innerHTML=bottomMarkup;
  $('#persistentTrait').textContent=`Evergreen Trait — ${S.bottom.persistent.name}: ${S.bottom.persistent.effect}${persistentIgnored()?' (ignored for this Layer)':''}`;
  $('#layerTrait').textContent=traitText();$('#progressLabel').textContent=`Bottoms Punished ${S.punished}/4`;$('#clockLabel').textContent=`Supply remaining ${S.supplyDeck.length+S.supply.length}/${S.supplyTotal||20} · Broken ${S.broken.length}`;
  $('#locationName').textContent=S.location.name;$('#locationFlavor').textContent=S.location.flavor;$('#locationEffect').textContent=S.location.effect;
