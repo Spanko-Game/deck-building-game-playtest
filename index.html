@@ -672,6 +672,40 @@ body.overlay-open{overflow:hidden}
   .encounter-art img{height:auto!important;min-height:0;aspect-ratio:3/2!important;object-fit:cover!important;object-position:center!important}
 }
 
+
+/* DESKTOP BOTTOM ART FIX — deliberately large, while mobile remains unchanged. */
+@media(min-width:700px){
+  .encounter-body{
+    display:grid!important;
+    grid-template-columns:minmax(360px,42%) minmax(0,1fr)!important;
+    gap:1.35rem!important;
+    align-items:start!important;
+  }
+  #bottomArt.encounter-art{
+    display:block!important;
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+  }
+  #bottomArt.encounter-art img,
+  #bottomArt.encounter-art .art-placeholder{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    aspect-ratio:3/2!important;
+    object-fit:cover!important;
+    object-position:center!important;
+    border-radius:.8rem!important;
+  }
+  .encounter-copy{min-width:0!important}
+}
+@media(min-width:1300px){
+  .encounter-body{
+    grid-template-columns:minmax(430px,44%) minmax(0,1fr)!important;
+  }
+}
+
 </style></head><body>
 <div id="dbg12-art" class="w-full space-y-4 text-[var(--viz-text)]">
   <div id="setup" class="intro-screen">
@@ -946,7 +980,7 @@ body.overlay-open{overflow:hidden}
 
 <script>
 (()=>{
-/* DUE FOR A SPANKING BUILD: 1.42 UX4 / BOTTOM AREA REWORK */
+/* DUE FOR A SPANKING BUILD: 1.42 UX5 / DESKTOP BOTTOM ART LARGE */
 const root=document.getElementById('dbg12-art'); if(root.dataset.ready)return; root.dataset.ready='1';
 const $=s=>root.querySelector(s), cp=o=>{ if (typeof structuredClone==='function') return structuredClone(o); return JSON.parse(JSON.stringify(o)); };
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
