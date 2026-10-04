@@ -625,133 +625,34 @@ body.overlay-open{overflow:hidden}
 }
 
 
-/* Reworked bottom encounter area: give the Bottom art much more presence on desktop. */
-.encounter-body{display:block}
-.encounter-art{margin:0 0 10px}
-.encounter-art img{display:block;width:100%;border-radius:.75rem}
 
-@media(min-width:640px){
-  #game>section:first-of-type{align-items:start}
-  .encounter-body{
-    display:grid;
-    grid-template-columns:minmax(320px,360px) minmax(0,1fr);
-    gap:1.15rem;
-    align-items:stretch;
-  }
-  .encounter-art{
-    margin:0;
-    display:flex;
-    align-self:stretch;
-    min-width:0;
-  }
-  .encounter-art .art-placeholder,
-  .encounter-art img{
-    width:100%!important;
-    height:100%!important;
-    min-height:360px;
-    aspect-ratio:4/5!important;
-    object-fit:cover!important;
-    object-position:center top!important;
-  }
-  .encounter-copy{
-    display:flex;
-    flex-direction:column;
-    min-height:100%;
-  }
-  .encounter-copy #layers{margin-top:1.15rem!important}
-}
-@media(min-width:1200px){
-  .encounter-body{grid-template-columns:minmax(360px,420px) minmax(0,1fr)}
-  .encounter-art .art-placeholder,
-  .encounter-art img{min-height:400px}
-}
-@media(max-width:639px){
-  .encounter-art{margin:0 0 10px}
-  .encounter-art .art-placeholder,
-  .encounter-art img{height:auto!important;min-height:0;aspect-ratio:3/2!important;object-fit:cover!important;object-position:center!important}
-}
+/* DEFINITIVE BOTTOM PANEL LAYOUT */
+.encounter-body{display:block!important}
+#bottomArt.encounter-art{width:100%!important;max-width:none!important;margin:0 0 1rem!important}
+.encounter-copy{display:block!important;width:100%!important;min-width:0!important}
 
-
-/* DESKTOP BOTTOM ART FIX — deliberately large, while mobile remains unchanged. */
 @media(min-width:700px){
-  .encounter-body{
-    display:grid!important;
-    grid-template-columns:minmax(360px,42%) minmax(0,1fr)!important;
-    gap:1.35rem!important;
-    align-items:start!important;
-  }
-  #bottomArt.encounter-art{
-    display:block!important;
-    width:100%!important;
-    max-width:none!important;
-    margin:0!important;
-  }
   #bottomArt.encounter-art img{
     display:block!important;
     width:100%!important;
     height:auto!important;
-    min-height:0!important;
     aspect-ratio:3/2!important;
+    max-height:540px!important;
     object-fit:cover!important;
     object-position:center!important;
-    border-radius:.8rem!important;
+    border-radius:.85rem!important;
   }
-  .encounter-copy{min-width:0!important}
-}
-@media(min-width:1300px){
-  .encounter-body{
-    grid-template-columns:minmax(430px,44%) minmax(0,1fr)!important;
-  }
+  .encounter-copy #layers{margin-top:1rem!important}
 }
 
-
-/* Bottom panel: large artwork on top, details below. */
-@media(min-width:700px){
-  .encounter-body{
-    display:block!important;
-  }
-
-  #bottomArt.encounter-art{
-    display:block!important;
-    width:100%!important;
-    max-width:none!important;
-    margin:0 0 1rem!important;
-  }
-
+@media(max-width:699px){
   #bottomArt.encounter-art img{
     display:block!important;
     width:100%!important;
     height:auto!important;
-    max-height:460px!important;
     aspect-ratio:3/2!important;
     object-fit:cover!important;
     object-position:center!important;
-    border-radius:.85rem!important;
-  }
-
-  /* Do not force the fallback placeholder visible when the real image loaded. */
-  #bottomArt.encounter-art .art-placeholder{
-    width:100%!important;
-    min-height:280px!important;
-    aspect-ratio:3/2!important;
-    align-items:center!important;
-    justify-content:center!important;
-    border-radius:.85rem!important;
-  }
-
-  .encounter-copy{
-    display:block!important;
-    width:100%!important;
-  }
-
-  .encounter-copy #layers{
-    margin-top:1rem!important;
-  }
-}
-
-@media(min-width:1300px){
-  #bottomArt.encounter-art img{
-    max-height:520px!important;
   }
 }
 
@@ -813,7 +714,7 @@ body.overlay-open{overflow:hidden}
     </div>
     <section class="grid gap-3 md:grid-cols-3">
       <div class="rounded-xl border border-[var(--viz-border)] bg-[var(--viz-card)] p-4 md:col-span-2">
-        <div class="encounter-body">
+        <div class="encounter-body" style="display:block !important;">
           <div id="bottomArt" class="encounter-art"></div>
           <div class="encounter-copy min-w-0">
             <div class="flex flex-wrap justify-between gap-3">
@@ -1029,7 +930,7 @@ body.overlay-open{overflow:hidden}
 
 <script>
 (()=>{
-/* DUE FOR A SPANKING BUILD: 1.42 UX6 / BOTTOM ART ABOVE DETAILS */
+/* DUE FOR A SPANKING BUILD: 1.42 UX7 / CLEAN BOTTOM STACK / NO BOTTOM PLACEHOLDER */
 const root=document.getElementById('dbg12-art'); if(root.dataset.ready)return; root.dataset.ready='1';
 const $=s=>root.querySelector(s), cp=o=>{ if (typeof structuredClone==='function') return structuredClone(o); return JSON.parse(JSON.stringify(o)); };
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -1047,9 +948,10 @@ const bottomArtStageUrl=(n,layerIndex)=>{
 const bottomArtImg=(n,layerIndex,cls='w-full rounded-lg object-cover')=>{
  if(!hasArt(n))return '';
  let base=artUrl(n);
- if(!isBottomArtKey(n)||layerIndex===0)return `<img src="${base}" alt="${esc(n)} artwork" class="${cls}" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex'"><div class="art-placeholder" style="display:none">Art placeholder</div>`;
+ if(!isBottomArtKey(n)||layerIndex===0)
+   return `<img src="${base}" alt="${esc(n)} artwork" class="${cls}" onerror="this.onerror=null;this.style.display='none'">`;
  let staged=bottomArtStageUrl(n,layerIndex);
- return `<img src="${staged}" alt="${esc(n)} artwork" class="${cls}" onerror="this.onerror=null;this.src='${base}';this.onerror=function(){this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='flex'}"><div class="art-placeholder" style="display:none">Art placeholder</div>`;
+ return `<img src="${staged}" alt="${esc(n)} artwork" class="${cls}" onerror="if(this.src!==new URL('${base}',document.baseURI).href){this.src='${base}';this.onerror=function(){this.style.display='none'}}else{this.style.display='none'}">`;
 };
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
